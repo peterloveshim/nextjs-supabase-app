@@ -164,22 +164,22 @@ async function SlowChart() {
 ### after() API 활용
 
 ```typescript
-import { after } from 'next/server'
+import { after } from "next/server";
 
 export async function POST(request: Request) {
-  const body = await request.json()
+  const body = await request.json();
 
   // 즉시 응답 반환
-  const result = await processUserData(body)
+  const result = await processUserData(body);
 
   // 비블로킹 작업은 after()로 처리
   after(async () => {
-    await sendAnalytics(result)
-    await updateCache(result.id)
-    await sendNotification(result.userId)
-  })
+    await sendAnalytics(result);
+    await updateCache(result.id);
+    await sendNotification(result.userId);
+  });
 
-  return Response.json({ success: true, id: result.id })
+  return Response.json({ success: true, id: result.id });
 }
 ```
 
@@ -189,15 +189,15 @@ export async function POST(request: Request) {
 같은 요청 내에서 캐시를 만료시키고 즉시 갱신합니다.
 
 ```typescript
-'use server'
+"use server";
 
-import { updateTag } from 'next/cache'
+import { updateTag } from "next/cache";
 
 export async function updateUserProfile(userId: string, profile: Profile) {
-  await db.users.update(userId, profile)
+  await db.users.update(userId, profile);
 
   // 캐시 만료 후 즉시 갱신 (revalidateTag와 달리 동일 요청 내 반영)
-  updateTag(`user-${userId}`)
+  updateTag(`user-${userId}`);
 }
 ```
 
@@ -208,33 +208,33 @@ export async function updateUserProfile(userId: string, profile: Profile) {
 export async function getProductData(id: string) {
   // 정적 데이터 (무기한 캐시)
   const staticData = await fetch(`/api/products/${id}`, {
-    cache: 'force-cache',
-  })
+    cache: "force-cache",
+  });
 
   // 동적 데이터 (캐시 없음)
   const dynamicData = await fetch(`/api/products/${id}/stock`, {
-    cache: 'no-store',
-  })
+    cache: "no-store",
+  });
 
   // 시간 기반 재검증
   const revalidatedData = await fetch(`/api/products/${id}`, {
     next: {
       revalidate: 3600, // 1시간 캐시
-      tags: [`product-${id}`, 'products'],
+      tags: [`product-${id}`, "products"],
     },
-  })
+  });
 
-  return revalidatedData.json()
+  return revalidatedData.json();
 }
 
 // 태그 기반 캐시 무효화
-import { revalidateTag } from 'next/cache'
+import { revalidateTag } from "next/cache";
 
 export async function updateProduct(id: string, data: ProductData) {
-  await updateDatabase(id, data)
+  await updateDatabase(id, data);
 
-  revalidateTag(`product-${id}`)
-  revalidateTag('products')
+  revalidateTag(`product-${id}`);
+  revalidateTag("products");
 }
 ```
 
@@ -258,22 +258,22 @@ export default async function Page() {
 
 ```typescript
 // next.config.ts
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true, // View Transitions API 통합 활성화
     typedRoutes: true,
     optimizePackageImports: [
-      'lucide-react',
-      '@radix-ui/react-icons',
-      'date-fns',
-      'lodash-es',
+      "lucide-react",
+      "@radix-ui/react-icons",
+      "date-fns",
+      "lodash-es",
     ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ### Turbopack 설정 (최상위 레벨로 이동)
@@ -281,27 +281,24 @@ export default nextConfig
 ```typescript
 // next.config.ts
 // ⚠️ Breaking Change: experimental.turbo → 최상위 turbopack으로 변경
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // ✅ Next.js 16: turbopack이 최상위 설정으로 승격
   turbopack: {
     rules: {
-      '*.module.css': {
-        loaders: ['css-loader'],
-        as: 'css',
+      "*.module.css": {
+        loaders: ["css-loader"],
+        as: "css",
       },
     },
   },
   experimental: {
-    optimizePackageImports: [
-      'lucide-react',
-      '@radix-ui/react-icons',
-    ],
+    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 ## ⚠️ Breaking Changes 대응
@@ -350,21 +347,21 @@ export default function UserForm() {
 
 ```typescript
 // middleware.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
 
 // Node.js Runtime이 기본값으로 안정화
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-}
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth-token')?.value
+  const token = request.cookies.get("auth-token")?.value;
 
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 ```
 
@@ -404,10 +401,10 @@ export default async function AdminPage() {
 ```typescript
 // app/api/heavy-task/route.ts
 // 기본값은 'nodejs', 필요시 'edge' 선택
-export const runtime = 'nodejs' // 'nodejs' | 'edge'
+export const runtime = "nodejs"; // 'nodejs' | 'edge'
 
 // ⚠️ 'edge' 런타임은 Cache Components와 호환되지 않음
-export const runtime = 'edge' // Cache Components 사용 불가
+export const runtime = "edge"; // Cache Components 사용 불가
 ```
 
 ## 🔄 New Features 활용
@@ -611,15 +608,15 @@ npm run check-all
 npm run build
 ```
 
-## Next.js 15 → 16 주요 변경 요약
+## Next.js 16 → 16 주요 변경 요약
 
-| 항목 | Next.js 15 | Next.js 16 |
-|------|-----------|-----------|
-| Async Request APIs | deprecated (동기식 경고) | **완전 제거** (동기식 런타임 에러) |
-| Turbopack 설정 | `experimental.turbo` | **최상위 `turbopack`** |
-| `unauthorized`/`forbidden` | `next/server` | **`next/navigation`** |
-| 서버 환경 변수 | `serverRuntimeConfig` | **Server Component 직접 접근** |
-| 새로운 API | `after()` | `updateTag()`, `connection()` 추가 |
-| View Transitions | 미지원 | **실험적 지원** (`experimental.viewTransition`) |
+| 항목                       | Next.js 16               | Next.js 16                                      |
+| -------------------------- | ------------------------ | ----------------------------------------------- |
+| Async Request APIs         | deprecated (동기식 경고) | **완전 제거** (동기식 런타임 에러)              |
+| Turbopack 설정             | `experimental.turbo`     | **최상위 `turbopack`**                          |
+| `unauthorized`/`forbidden` | `next/server`            | **`next/navigation`**                           |
+| 서버 환경 변수             | `serverRuntimeConfig`    | **Server Component 직접 접근**                  |
+| 새로운 API                 | `after()`                | `updateTag()`, `connection()` 추가              |
+| View Transitions           | 미지원                   | **실험적 지원** (`experimental.viewTransition`) |
 
 이 지침을 따라 Next.js 16.2.0의 모든 기능을 최대한 활용하여 현대적이고 성능 최적화된 애플리케이션을 개발하세요.

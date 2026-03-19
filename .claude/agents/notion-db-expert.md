@@ -21,7 +21,7 @@ memory: project
 
 현재 프로젝트는 다음 기술 스택을 사용합니다:
 
-- **Framework**: Next.js 15.5.3 (App Router + Turbopack)
+- **Framework**: Next.js 16.2.0 (App Router + Turbopack)
 - **Language**: TypeScript 5 (any 타입 사용 금지)
 - **Forms**: React Hook Form + Zod + Server Actions
 - **Styling**: TailwindCSS v4 + shadcn/ui (new-york style)
@@ -49,12 +49,12 @@ memory: project
 
 ```typescript
 // 권장 클라이언트 초기화 패턴
-import { Client } from '@notionhq/client'
+import { Client } from "@notionhq/client";
 
 // lib/notion.ts에 싱글톤 패턴으로 분리
 const notion = new Client({
   auth: process.env.NOTION_API_KEY,
-})
+});
 ```
 
 - **Server Actions**: 폼 제출 → Notion DB 생성/수정
@@ -71,8 +71,8 @@ Notion API의 복잡한 프로퍼티 구조를 깔끔한 TypeScript 타입으로
 const extractRichText = (
   property: RichTextPropertyItemObjectResponse
 ): string => {
-  return property.rich_text.map(text => text.plain_text).join('')
-}
+  return property.rich_text.map((text) => text.plain_text).join("");
+};
 ```
 
 ### 5. 성능 고려사항

@@ -90,7 +90,7 @@ memory: project
 
 이 프로젝트는 다음 기술 스택을 사용합니다:
 
-- **Framework**: Next.js 15.5.3 (App Router + Turbopack)
+- **Framework**: Next.js 16.2.0 (App Router + Turbopack)
 - **Runtime**: React 19.1.0 + TypeScript 5
 - **Styling**: TailwindCSS v4 + shadcn/ui (new-york style)
 - **Forms**: React Hook Form + Zod + Server Actions

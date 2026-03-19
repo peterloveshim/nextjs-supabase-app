@@ -1,6 +1,6 @@
 # 프로젝트 구조 가이드
 
-이 문서는 Next.js 15.5.3 프로젝트의 폴더 구조, 파일 조직 및 네이밍 컨벤션을 정의합니다.
+이 문서는 Next.js 16.2.0 프로젝트의 폴더 구조, 파일 조직 및 네이밍 컨벤션을 정의합니다.
 
 ## 🏗️ 전체 프로젝트 구조
 
@@ -175,13 +175,13 @@ user_settings/         # snake_case (금지)
 
 ```typescript
 // ✅ 경로 별칭 사용 (권장)
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { LoginForm } from '@/components/login-form'
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { LoginForm } from "@/components/login-form";
 
 // ❌ 상대 경로 사용 (금지)
-import { Button } from '../../../components/ui/button'
-import { cn } from '../../lib/utils'
+import { Button } from "../../../components/ui/button";
+import { cn } from "../../lib/utils";
 ```
 
 **📍 정의된 별칭:**
@@ -249,15 +249,15 @@ src/lib/api-utils.ts        # 새 파일 생성
 
 ```typescript
 // 1. 외부 라이브러리
-import React from 'react'
-import { NextPage } from 'next'
+import React from "react";
+import { NextPage } from "next";
 
 // 2. 내부 라이브러리 (@/ 경로)
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // 3. 상대 경로
-import './component.css'
+import "./component.css";
 ```
 
 ### 3. Export 규칙
@@ -271,7 +271,7 @@ export default function LoginPage() {}
 
 // ❌ 혼재 사용 지양
 export function LoginForm() {}
-export default LoginForm // 같은 컴포넌트를 두 방식으로 export
+export default LoginForm; // 같은 컴포넌트를 두 방식으로 export
 ```
 
 ### 4. 파일 크기 관리
@@ -306,11 +306,11 @@ export function SuperMegaComponent() {
 }
 
 // 혼재된 import
-import Button from '@/components/ui/button' // default
-import { Card } from '@/components/ui/card' // named
+import Button from "@/components/ui/button"; // default
+import { Card } from "@/components/ui/card"; // named
 
 // 깊은 상대 경로
-import { utils } from '../../../../../lib/utils'
+import { utils } from "../../../../../lib/utils";
 ```
 
 ## ✅ 체크리스트

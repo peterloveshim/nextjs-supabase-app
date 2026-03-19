@@ -10,7 +10,7 @@ memory: project
 
 ## 전문 영역
 
-- Next.js 15.5.3 App Router 아키텍처
+- Next.js 16.2.0 App Router 아키텍처
 - React 19 패턴 및 최적화
 - TypeScript 5 엄격한 타입 시스템
 - TailwindCSS v4 + shadcn/ui 스타일링
