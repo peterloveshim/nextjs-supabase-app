@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { GoogleLoginButton } from "@/components/google-login-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -58,6 +60,18 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* 구글 OAuth 로그인 버튼 */}
+          <GoogleLoginButton label="Google로 로그인" />
+
+          {/* 구분선: 소셜 로그인과 이메일 폼 사이 */}
+          <div className="my-4 flex items-center gap-3">
+            <Separator className="flex-1" />
+            <span className="text-xs text-muted-foreground">
+              또는 이메일로 계속
+            </span>
+            <Separator className="flex-1" />
+          </div>
+
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
