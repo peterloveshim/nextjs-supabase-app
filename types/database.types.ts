@@ -14,6 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_members: {
+        Row: {
+          event_id: string
+          id: string
+          joined_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          joined_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          joined_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_members_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          capacity: number
+          created_at: string
+          description: string | null
+          host_id: string
+          id: string
+          location: string
+          start_at: string
+          status: string
+          title: string
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          description?: string | null
+          host_id: string
+          id?: string
+          location: string
+          start_at: string
+          status?: string
+          title: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          description?: string | null
+          host_id?: string
+          id?: string
+          location?: string
+          start_at?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -186,9 +269,16 @@ export const Constants = {
   },
 } as const
 
-// =============================================
-// 편의용 타입 별칭
-// =============================================
-export type Profile = Tables<"profiles">
-export type ProfileInsert = TablesInsert<"profiles">
-export type ProfileUpdate = TablesUpdate<"profiles">
+// ========================================
+// 편의 타입 (Supabase 테이블 Row/Insert/Update 단축)
+// ========================================
+
+export type Event = Database['public']['Tables']['events']['Row']
+export type EventInsert = Database['public']['Tables']['events']['Insert']
+export type EventUpdate = Database['public']['Tables']['events']['Update']
+export type EventMember = Database['public']['Tables']['event_members']['Row']
+export type EventMemberInsert = Database['public']['Tables']['event_members']['Insert']
+export type EventMemberUpdate = Database['public']['Tables']['event_members']['Update']
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
