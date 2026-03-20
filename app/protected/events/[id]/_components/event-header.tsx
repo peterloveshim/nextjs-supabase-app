@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { type EventDetail, type EventStatus } from "@/lib/mock-data";
+import type { EventDetailView, EventStatus } from "@/lib/types/event";
 
 // 날짜 포맷 유틸: YYYY년 MM월 DD일 HH:mm
 function formatDate(dateStr: string): string {
@@ -44,7 +44,7 @@ function getStatusBadge(status: EventStatus) {
 }
 
 type EventHeaderProps = {
-  event: EventDetail;
+  event: EventDetailView;
   // 주최자 여부: 수정/삭제 버튼 표시
   isHost: boolean;
   onDeleteClick: () => void;
@@ -57,10 +57,11 @@ export function EventHeader({
 }: EventHeaderProps) {
   const [copied, setCopied] = useState(false);
 
-  // 현재 페이지 링크를 클립보드에 복사
+  // 현재 페이지 링크를 클립보드에 복사 (autoJoin=true 파라미터 포함)
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      const shareUrl = `${window.location.origin}/protected/events/${event.id}?autoJoin=true`;
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

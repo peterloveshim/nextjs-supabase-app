@@ -50,12 +50,15 @@ type EventFormProps = {
   // 수정 모드 여부 (상태 셀렉트 표시)
   isEdit?: boolean;
   onSubmit: (data: EventFormValues) => void;
+  // 제출 중 여부 (버튼 비활성화)
+  isSubmitting?: boolean;
 };
 
 export function EventForm({
   defaultValues,
   isEdit = false,
   onSubmit,
+  isSubmitting = false,
 }: EventFormProps) {
   const router = useRouter();
 
@@ -202,8 +205,12 @@ export function EventForm({
 
         {/* 버튼 그룹 */}
         <div className="flex gap-3">
-          <Button type="submit" className="flex-1 sm:flex-none">
-            {isEdit ? "수정하기" : "만들기"}
+          <Button
+            type="submit"
+            className="flex-1 sm:flex-none"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "저장 중..." : isEdit ? "수정하기" : "만들기"}
           </Button>
           <Button
             type="button"

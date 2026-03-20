@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { type Event } from "@/lib/mock-data";
+import type { EventListItem } from "@/lib/types/event";
 
 import { EventCard } from "./event-card";
 
 type EventListProps = {
-  events: Event[];
+  events: EventListItem[];
   // 주최자 여부: true이면 빈 상태에서 '이벤트 만들기' 버튼 표시
   isHost?: boolean;
 };

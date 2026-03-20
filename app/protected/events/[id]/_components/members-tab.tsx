@@ -2,11 +2,11 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  type EventDetail,
-  type EventMember,
-  type MemberStatus,
-} from "@/lib/mock-data";
+import type {
+  EventDetailView,
+  EventMemberWithProfile,
+  MemberStatus,
+} from "@/lib/types/event";
 
 // 날짜 포맷 유틸: YYYY년 MM월 DD일
 function formatDate(dateStr: string): string {
@@ -42,17 +42,31 @@ function getMemberStatusBadge(status: MemberStatus) {
 }
 
 type MembersTabProps = {
-  event: EventDetail;
+  event: EventDetailView;
   // 주최자 여부
   isHost: boolean;
-  // 현재 로그인한 사용자 ID (Mock: 'current-user')
+  // 현재 로그인한 사용자 ID
   currentUserId?: string;
+  // 참여 신청 핸들러
+  onApplyEvent?: () => void;
+  // 멤버 상태 변경 핸들러 (주최자 전용)
+  onUpdateMemberStatus?: (
+    memberId: string,
+    status: "approved" | "rejected"
+  ) => void;
+  // mutation 로딩 상태
+  isApplying?: boolean;
+  isUpdatingMember?: boolean;
 };
 
 export function MembersTab({
   event,
   isHost,
-  currentUserId = "current-user",
+  currentUserId,
+  onApplyEvent,
+  onUpdateMemberStatus,
+  isApplying = false,
+  isUpdatingMember = false,
 }: MembersTabProps) {
   // 승인된 참여자 수 계산
   const approvedCount = event.members.filter(
@@ -60,23 +74,11 @@ export function MembersTab({
   ).length;
 
   // 현재 사용자의 참여 상태 확인
-  const myMember = event.members.find((m) => m.userId === currentUserId);
+  const myMember = currentUserId
+    ? event.members.find((m) => m.userId === currentUserId)
+    : undefined;
   const isApproved = myMember?.status === "approved";
-
-  // Mock 승인 처리
-  const handleApprove = (member: EventMember) => {
-    console.log("멤버 승인:", member);
-  };
-
-  // Mock 거절 처리
-  const handleReject = (member: EventMember) => {
-    console.log("멤버 거절:", member);
-  };
-
-  // Mock 참여 신청 처리
-  const handleJoinRequest = () => {
-    console.log("참여 신청:", { eventId: event.id, userId: currentUserId });
-  };
+  const isPending = myMember?.status === "pending";
 
   return (
     <div className="space-y-4">
@@ -89,10 +91,21 @@ export function MembersTab({
         </p>
 
         {/* 비주최자이고 아직 미승인 상태인 경우 참여 신청 버튼 */}
-        {!isHost && !isApproved && (
-          <Button size="sm" onClick={handleJoinRequest}>
-            {myMember ? "재신청" : "참여 신청"}
+        {!isHost && !isApproved && !isPending && (
+          <Button
+            size="sm"
+            onClick={onApplyEvent}
+            disabled={isApplying || event.status !== "open"}
+          >
+            {isApplying ? "신청 중..." : "참여 신청"}
           </Button>
+        )}
+
+        {/* 대기 중 상태 표시 */}
+        {!isHost && isPending && (
+          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+            승인 대기 중
+          </Badge>
         )}
       </div>
 
@@ -103,7 +116,7 @@ export function MembersTab({
             아직 참여 신청자가 없습니다.
           </p>
         ) : (
-          event.members.map((member) => (
+          event.members.map((member: EventMemberWithProfile) => (
             <div
               key={member.id}
               className="flex items-center justify-between gap-3 px-4 py-3"
@@ -131,7 +144,10 @@ export function MembersTab({
                     size="sm"
                     variant="outline"
                     className="text-green-700 hover:bg-green-50 hover:text-green-700"
-                    onClick={() => handleApprove(member)}
+                    disabled={isUpdatingMember}
+                    onClick={() =>
+                      onUpdateMemberStatus?.(member.id, "approved")
+                    }
                   >
                     승인
                   </Button>
@@ -139,7 +155,10 @@ export function MembersTab({
                     size="sm"
                     variant="outline"
                     className="text-red-600 hover:bg-red-50 hover:text-red-600"
-                    onClick={() => handleReject(member)}
+                    disabled={isUpdatingMember}
+                    onClick={() =>
+                      onUpdateMemberStatus?.(member.id, "rejected")
+                    }
                   >
                     거절
                   </Button>

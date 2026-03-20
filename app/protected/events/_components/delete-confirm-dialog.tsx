@@ -15,12 +15,15 @@ type DeleteConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  // 삭제 진행 중 여부
+  isDeleting?: boolean;
 };
 
 export function DeleteConfirmDialog({
   open,
   onOpenChange,
   onConfirm,
+  isDeleting = false,
 }: DeleteConfirmDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -36,9 +39,10 @@ export function DeleteConfirmDialog({
           <AlertDialogCancel>취소</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
+            disabled={isDeleting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            삭제
+            {isDeleting ? "삭제 중..." : "삭제"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

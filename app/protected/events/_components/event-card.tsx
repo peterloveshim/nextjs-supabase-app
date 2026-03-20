@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  type Event,
-  type EventStatus,
-  type MemberStatus,
-} from "@/lib/mock-data";
+import type {
+  EventListItem,
+  EventStatus,
+  MemberStatus,
+} from "@/lib/types/event";
 
 // 날짜 포맷 유틸: YYYY년 MM월 DD일 HH:mm
 function formatDate(dateStr: string): string {
@@ -70,7 +70,7 @@ function getMemberStatusBadge(status: MemberStatus) {
 }
 
 type EventCardProps = {
-  event: Event;
+  event: EventListItem;
 };
 
 export function EventCard({ event }: EventCardProps) {
@@ -110,7 +110,7 @@ export function EventCard({ event }: EventCardProps) {
         {/* 정원 */}
         <p>
           <span className="font-medium text-foreground">정원</span>{" "}
-          {event.currentCount} / {event.capacity}명
+          {event.approvedCount} / {event.capacity}명
         </p>
       </CardContent>
     </Card>
