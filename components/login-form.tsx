@@ -19,15 +19,22 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+interface LoginFormProps extends React.ComponentPropsWithoutRef<"div"> {
+  // 로그인 성공 후 이동할 경로 (비로그인 접근 시 원래 경로)
+  redirectTo?: string;
+}
+
+export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  // 로그인 성공 후 이동 경로: redirect_to 파라미터 → 기본 이벤트 목록 페이지
+  const destination = redirectTo
+    ? decodeURIComponent(redirectTo)
+    : "/protected/events";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +48,8 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
+      // 로그인 성공: redirect_to 경로 또는 기본 이벤트 목록으로 이동
+      router.push(destination);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -61,7 +68,7 @@ export function LoginForm({
         </CardHeader>
         <CardContent>
           {/* 구글 OAuth 로그인 버튼 */}
-          <GoogleLoginButton label="Google로 로그인" />
+          <GoogleLoginButton label="Google로 로그인" redirectTo={redirectTo} />
 
           {/* 구분선: 소셜 로그인과 이메일 폼 사이 */}
           <div className="my-4 flex items-center gap-3">

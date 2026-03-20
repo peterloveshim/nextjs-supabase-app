@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/server";
 
 const FEATURES = [
   {
@@ -32,7 +33,11 @@ const FEATURES = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const isLoggedIn = !!data?.claims;
+
   return (
     <div className="flex min-h-screen flex-col">
       <LandingHeader />
@@ -50,9 +55,11 @@ export default function Home() {
           <Button asChild size="lg">
             <Link href="/protected/events">시작하기</Link>
           </Button>
-          <Button asChild size="lg" variant="outline">
-            <Link href="/auth/login">로그인</Link>
-          </Button>
+          {!isLoggedIn && (
+            <Button asChild size="lg" variant="outline">
+              <Link href="/auth/login">로그인</Link>
+            </Button>
+          )}
         </div>
       </section>
 

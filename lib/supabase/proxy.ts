@@ -54,9 +54,11 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth")
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    // 비인증 사용자: 로그인 페이지로 리다이렉트 (원래 접근 경로를 redirect_to 파라미터로 전달)
     const url = request.nextUrl.clone();
+    const originalPath = request.nextUrl.pathname + request.nextUrl.search;
     url.pathname = "/auth/login";
+    url.search = `?redirect_to=${encodeURIComponent(originalPath)}`;
     return NextResponse.redirect(url);
   }
 

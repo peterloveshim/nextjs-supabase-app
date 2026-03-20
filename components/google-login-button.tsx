@@ -40,14 +40,18 @@ function GoogleIcon() {
 interface GoogleLoginButtonProps {
   /** 버튼에 표시할 텍스트 (기본값: "Google로 계속하기") */
   label?: string;
+  /** 로그인 성공 후 이동할 경로 (인코딩된 URL) */
+  redirectTo?: string;
 }
 
 /**
  * Google OAuth 로그인 버튼 컴포넌트
  * 클릭 시 Supabase OAuth 플로우를 시작하고 /auth/callback으로 리다이렉트된다.
+ * redirectTo가 있으면 OAuth 콜백의 next 파라미터로 전달한다.
  */
 export function GoogleLoginButton({
   label = "Google로 계속하기",
+  redirectTo,
 }: GoogleLoginButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,11 +60,16 @@ export function GoogleLoginButton({
     setIsLoading(true);
 
     try {
+      // redirectTo가 있으면 OAuth 콜백에 next 파라미터로 포함
+      const callbackUrl = redirectTo
+        ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(decodeURIComponent(redirectTo))}`
+        : `${window.location.origin}/auth/callback`;
+
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           // OAuth 인증 완료 후 돌아올 콜백 URL
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: callbackUrl,
         },
       });
       // signInWithOAuth는 브라우저를 Google 로그인 페이지로 리다이렉트하므로
