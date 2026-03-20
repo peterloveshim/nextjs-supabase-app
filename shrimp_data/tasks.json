@@ -1,0 +1,448 @@
+{
+  "tasks": [
+    {
+      "id": "11e4e2c0-4756-4aab-aac4-1a52d487d02f",
+      "name": "Task 001: 공통 레이아웃 및 라우트 구조 설정",
+      "description": "필수 패키지 설치, 라우트 구조 생성, 헤더/네비게이션 컴포넌트 구현. 모든 후속 태스크의 기반.\n\n수락 기준:\n- /protected/events, /protected/events/new, /protected/events/[id], /protected/events/[id]/edit, /protected/notifications 라우트 존재\n- 헤더에 서비스명, 알림 아이콘, 네비게이션 메뉴 표시\n- 모바일 반응형 네비게이션 동작\n- TanStack Query, Zustand, nuqs, React Hook Form, Zod 설치 완료",
+      "notes": "QueryClientProvider는 'use client'가 필요하므로 별도 컴포넌트로 분리. proxy.ts의 공개 경로 목록 확인 필요(변경 불필요). 헤더에서 기존 DeployButton, EnvVarWarning 제거 가능.",
+      "status": "in_progress",
+      "dependencies": [],
+      "createdAt": "2026-03-20T07:31:29.068Z",
+      "updatedAt": "2026-03-20T07:36:41.776Z",
+      "relatedFiles": [
+        {
+          "path": "app/protected/layout.tsx",
+          "type": "TO_MODIFY",
+          "description": "QueryClientProvider 추가, 헤더 교체"
+        },
+        {
+          "path": "components/header-nav.tsx",
+          "type": "CREATE",
+          "description": "서비스 공통 헤더/네비게이션 컴포넌트"
+        },
+        {
+          "path": "lib/query-client.tsx",
+          "type": "CREATE",
+          "description": "TanStack Query QueryClient 설정"
+        },
+        {
+          "path": "app/protected/events/page.tsx",
+          "type": "CREATE",
+          "description": "이벤트 목록(대시보드) 페이지 껍데기"
+        },
+        {
+          "path": "app/protected/events/new/page.tsx",
+          "type": "CREATE",
+          "description": "이벤트 생성 페이지 껍데기"
+        },
+        {
+          "path": "app/protected/events/[id]/page.tsx",
+          "type": "CREATE",
+          "description": "이벤트 상세 페이지 껍데기"
+        },
+        {
+          "path": "app/protected/events/[id]/edit/page.tsx",
+          "type": "CREATE",
+          "description": "이벤트 수정 페이지 껍데기"
+        },
+        {
+          "path": "app/protected/notifications/page.tsx",
+          "type": "CREATE",
+          "description": "알림 목록 페이지 껍데기"
+        },
+        {
+          "path": "tasks/000-sample.md",
+          "type": "CREATE",
+          "description": "태스크 파일 샘플 (초기 상태 예시)"
+        },
+        {
+          "path": "tasks/001-layout-setup.md",
+          "type": "CREATE",
+          "description": "Task 001 명세 파일"
+        },
+        {
+          "path": "shrimp-rules.md",
+          "type": "REFERENCE",
+          "description": "프로젝트 개발 가이드라인"
+        },
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "패키지 의존성 추가"
+        }
+      ],
+      "implementationGuide": "1. 패키지 설치: npm install @tanstack/react-query @tanstack/react-query-devtools zustand nuqs react-hook-form zod @hookform/resolvers\n2. shadcn 컴포넌트 추가: npx shadcn@latest add sheet separator (select, dialog, tabs, textarea, form은 후속 태스크에서 추가)\n3. app/protected/layout.tsx 수정: QueryClientProvider 래핑, 헤더 컴포넌트 교체\n4. components/header-nav.tsx 생성: 서비스명 '모임이음', Bell 아이콘(알림), 모바일 Sheet 메뉴, 데스크톱 nav 링크\n5. 라우트 파일 생성 (빈 껍데기):\n   - app/protected/events/page.tsx\n   - app/protected/events/new/page.tsx\n   - app/protected/events/[id]/page.tsx\n   - app/protected/events/[id]/edit/page.tsx\n   - app/protected/notifications/page.tsx\n6. lib/query-client.tsx 생성: QueryClient 싱글턴 설정\n7. tasks/000-sample.md, tasks/001-layout-setup.md 생성",
+      "verificationCriteria": "1. npm run dev 실행 후 /protected/events 접근 가능\n2. 헤더에 '모임이음' 로고, 알림 벨, 네비게이션 표시\n3. 모바일(375px) 에서 햄버거/Sheet 메뉴 동작\n4. 모든 라우트(/protected/events, /new, /[id], /[id]/edit, /notifications)가 404 없이 접근 가능\n5. TypeScript 타입 오류 없음 (npm run type-check)",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    },
+    {
+      "id": "5746af4e-2dbb-466b-8ccf-432841b03672",
+      "name": "Task 002: 대시보드 페이지 UI (Mock)",
+      "description": "Mock 이벤트 데이터를 활용해 대시보드 UI 구현. '내가 만든 이벤트' / '내가 참여하는 이벤트' 탭, 이벤트 카드, 빈 상태 UI.\n\n수락 기준:\n- 탭 전환 시 각각의 이벤트 목록 표시\n- 이벤트 카드에 제목, 장소, 날짜, 상태 뱃지, 정원 표시\n- open/closed/cancelled 상태 뱃지 색상 구분\n- '이벤트 만들기' 버튼 클릭 시 /protected/events/new 이동\n- 빈 상태(empty state) UI 표시\n- Playwright MCP로 UI 스냅샷 검토 완료",
+      "notes": "날짜 포맷은 'YYYY년 MM월 DD일 HH:mm' 형식. 한국어 UI. 탭 상태는 로컬 useState로 관리(nuqs는 Task 004에서 적용).",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "11e4e2c0-4756-4aab-aac4-1a52d487d02f"
+        }
+      ],
+      "createdAt": "2026-03-20T07:31:29.069Z",
+      "updatedAt": "2026-03-20T07:31:29.069Z",
+      "relatedFiles": [
+        {
+          "path": "lib/mock-data.ts",
+          "type": "CREATE",
+          "description": "Mock 이벤트 데이터 및 타입 정의"
+        },
+        {
+          "path": "app/protected/events/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "대시보드 UI 구현"
+        },
+        {
+          "path": "app/protected/events/_components/event-card.tsx",
+          "type": "CREATE",
+          "description": "이벤트 카드 컴포넌트"
+        },
+        {
+          "path": "app/protected/events/_components/event-list.tsx",
+          "type": "CREATE",
+          "description": "이벤트 목록 컴포넌트"
+        },
+        {
+          "path": "tasks/002-dashboard-ui.md",
+          "type": "CREATE",
+          "description": "Task 002 명세 파일"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "REFERENCE",
+          "description": "상태 뱃지 재사용"
+        },
+        {
+          "path": "components/ui/card.tsx",
+          "type": "REFERENCE",
+          "description": "이벤트 카드 기반"
+        },
+        {
+          "path": "shrimp-rules.md",
+          "type": "REFERENCE",
+          "description": "컴포넌트 작성 규칙"
+        }
+      ],
+      "implementationGuide": "1. shadcn 추가: npx shadcn@latest add tabs\n2. lib/mock-data.ts 생성: Event 타입 정의 및 Mock 데이터 배열 (내가 만든/참여하는 이벤트 각 3개)\n   - Event 타입: { id, title, location, startAt, capacity, currentCount, status: 'open'|'closed'|'cancelled', myStatus?: 'pending'|'approved'|'rejected' }\n3. app/protected/events/page.tsx 구현:\n   - Tabs 컴포넌트로 '내가 만든 이벤트' | '내가 참여하는 이벤트' 탭\n   - '이벤트 만들기' Button (Link)\n4. app/protected/events/_components/event-card.tsx 생성:\n   - Card 컴포넌트 기반\n   - 상태 뱃지: open=green, closed=gray, cancelled=red\n   - 참여 상태 뱃지: pending=yellow, approved=green, rejected=red\n   - 클릭 시 /protected/events/[id] 이동\n5. app/protected/events/_components/event-list.tsx 생성:\n   - EventCard 목록 렌더링\n   - 빈 상태 UI (이벤트 없음 메시지 + 생성 버튼)\n6. tasks/002-dashboard-ui.md 생성\n7. Playwright MCP로 /protected/events 스냅샷 촬영 및 검토",
+      "verificationCriteria": "1. /protected/events 접근 시 탭과 이벤트 카드 렌더링\n2. 탭 전환 동작 확인\n3. 상태 뱃지 색상 구분 표시\n4. '이벤트 만들기' 버튼 → /protected/events/new 이동\n5. 빈 탭의 경우 empty state 표시\n6. 모바일(375px) 반응형 확인\n7. Playwright 스냅샷 검토 완료\n8. TypeScript 타입 오류 없음",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    },
+    {
+      "id": "76d56812-29aa-4e8e-a6aa-9077fe712f8b",
+      "name": "Task 003: 이벤트 생성/수정 페이지 UI (Mock)",
+      "description": "React Hook Form + Zod 기반 이벤트 생성/수정 폼 UI 구현. 공통 EventForm 컴포넌트 재사용. Mock 제출 처리.\n\n수락 기준:\n- 이벤트 생성 폼 (제목, 설명, 장소, 날짜/시간, 정원) 유효성 검사 동작\n- 이벤트 수정 폼에서 기존 값 프리필\n- 상태 변경 셀렉트 (open/closed/cancelled)\n- 삭제 확인 다이얼로그 동작\n- Mock 제출 시 콘솔 로그 및 성공 메시지\n- Playwright MCP로 폼 UI 검토 완료",
+      "notes": "datetime-local input의 값 포맷: 'YYYY-MM-DDTHH:mm'. Zod에서 string을 Date로 변환하는 transform 적용. 취소 버튼은 router.back() 또는 /protected/events로 이동.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "11e4e2c0-4756-4aab-aac4-1a52d487d02f"
+        }
+      ],
+      "createdAt": "2026-03-20T07:31:29.069Z",
+      "updatedAt": "2026-03-20T07:31:29.069Z",
+      "relatedFiles": [
+        {
+          "path": "lib/validations/event.ts",
+          "type": "CREATE",
+          "description": "이벤트 Zod 스키마 및 타입"
+        },
+        {
+          "path": "app/protected/events/_components/event-form.tsx",
+          "type": "CREATE",
+          "description": "이벤트 생성/수정 공통 폼 컴포넌트"
+        },
+        {
+          "path": "app/protected/events/_components/delete-confirm-dialog.tsx",
+          "type": "CREATE",
+          "description": "이벤트 삭제 확인 다이얼로그"
+        },
+        {
+          "path": "app/protected/events/new/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "이벤트 생성 페이지 구현"
+        },
+        {
+          "path": "app/protected/events/[id]/edit/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "이벤트 수정 페이지 구현"
+        },
+        {
+          "path": "tasks/003-event-form-ui.md",
+          "type": "CREATE",
+          "description": "Task 003 명세 파일"
+        },
+        {
+          "path": "shrimp-rules.md",
+          "type": "REFERENCE",
+          "description": "폼 구현 규칙"
+        }
+      ],
+      "implementationGuide": "1. shadcn 추가: npx shadcn@latest add form select dialog textarea\n2. lib/validations/event.ts 생성:\n   - eventSchema: Zod 스키마 (title: string min 2, description: string optional, location: string min 2, startAt: date, capacity: number min 1 max 100, status: enum open/closed/cancelled)\n   - EventFormValues 타입 export\n3. app/protected/events/_components/event-form.tsx 생성 ('use client'):\n   - Props: { defaultValues?: Partial<EventFormValues>, isEdit?: boolean, onSubmit: (data: EventFormValues) => void }\n   - useForm with zodResolver\n   - 필드: 제목(Input), 설명(Textarea), 장소(Input), 날짜/시간(Input type=datetime-local), 정원(Input type=number), 상태(Select, isEdit일 때만 표시)\n   - 제출/취소 버튼\n4. app/protected/events/new/page.tsx 구현:\n   - EventForm 컴포넌트 렌더링\n   - onSubmit: console.log + toast/alert '이벤트가 생성되었습니다'\n5. app/protected/events/[id]/edit/page.tsx 구현:\n   - Mock defaultValues 주입\n   - 삭제 버튼 + DeleteConfirmDialog\n6. app/protected/events/_components/delete-confirm-dialog.tsx 생성:\n   - AlertDialog 또는 Dialog 기반\n   - '정말 삭제하시겠습니까?' 확인\n7. tasks/003-event-form-ui.md 생성\n8. Playwright MCP로 폼 검토",
+      "verificationCriteria": "1. 필수 필드 미입력 시 에러 메시지 표시\n2. 유효한 데이터 제출 시 Mock 성공 처리\n3. 수정 페이지에서 기존 값 프리필 확인\n4. 삭제 다이얼로그 열기/닫기/확인 동작\n5. 상태 셀렉트 (수정 시에만 표시)\n6. 모바일 반응형 확인\n7. Playwright 스냅샷 검토 완료\n8. TypeScript 타입 오류 없음",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    },
+    {
+      "id": "90fc3721-6a4f-497c-80b7-cd0450c7c877",
+      "name": "Task 004: 이벤트 상세 페이지 UI (Mock)",
+      "description": "nuqs 기반 탭 URL 상태 관리로 이벤트 상세 페이지 구현. 공지/참여자/카풀/정산 탭, 역할별 UI 분기(주최자 vs 참여자).\n\n수락 기준:\n- 이벤트 정보 헤더 영역 (제목, 장소, 날짜, 정원, 상태, 링크 복사)\n- URL ?tab=members 파라미터로 탭 상태 유지\n- 참여자 탭: 신청자 목록, 상태별 표시, 승인/정원 카운트\n- 주최자: 승인/거절 버튼 표시\n- 참여자(비승인): 참여 신청 버튼 표시\n- Mock 역할 토글로 두 역할 UI 검토\n- Playwright MCP로 상세 페이지 UI 검토 완료",
+      "notes": "nuqs의 useQueryState는 'use client' 환경에서만 동작. 링크 복사는 window.location.href 사용. Mock 역할 토글은 개발 편의용으로 눈에 띄게 표시(Dev 뱃지 등). Tab URL: announcements/members/carpool/settlement.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "5746af4e-2dbb-466b-8ccf-432841b03672"
+        },
+        {
+          "taskId": "76d56812-29aa-4e8e-a6aa-9077fe712f8b"
+        }
+      ],
+      "createdAt": "2026-03-20T07:31:29.069Z",
+      "updatedAt": "2026-03-20T07:31:29.069Z",
+      "relatedFiles": [
+        {
+          "path": "app/protected/events/[id]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "이벤트 상세 페이지 구현"
+        },
+        {
+          "path": "app/protected/events/[id]/_components/event-header.tsx",
+          "type": "CREATE",
+          "description": "이벤트 상세 헤더 컴포넌트"
+        },
+        {
+          "path": "app/protected/events/[id]/_components/members-tab.tsx",
+          "type": "CREATE",
+          "description": "참여자 탭 컴포넌트"
+        },
+        {
+          "path": "app/protected/events/[id]/_components/announcements-tab.tsx",
+          "type": "CREATE",
+          "description": "공지 탭 placeholder"
+        },
+        {
+          "path": "app/protected/events/[id]/_components/carpool-tab.tsx",
+          "type": "CREATE",
+          "description": "카풀 탭 placeholder"
+        },
+        {
+          "path": "app/protected/events/[id]/_components/settlement-tab.tsx",
+          "type": "CREATE",
+          "description": "정산 탭 placeholder"
+        },
+        {
+          "path": "lib/mock-data.ts",
+          "type": "TO_MODIFY",
+          "description": "이벤트 상세 Mock 데이터 확장"
+        },
+        {
+          "path": "tasks/004-event-detail-ui.md",
+          "type": "CREATE",
+          "description": "Task 004 명세 파일"
+        }
+      ],
+      "implementationGuide": "1. shadcn 추가: npx shadcn@latest add tabs (이미 추가했으면 스킵)\n2. lib/mock-data.ts 확장: 이벤트 상세 Mock (멤버 목록 포함)\n   - EventMember 타입: { id, userId, name, email, status: 'pending'|'approved'|'rejected', joinedAt }\n3. app/protected/events/[id]/page.tsx 구현 ('use client', nuqs 사용):\n   - useQueryState('tab', { defaultValue: 'members' })\n   - Mock 역할 토글 버튼 (개발 전용: isHost state)\n   - EventHeader 컴포넌트 렌더링\n   - Tabs로 공지/참여자/카풀/정산 탭 전환\n4. app/protected/events/[id]/_components/event-header.tsx 생성:\n   - 제목, 장소, 날짜, 정원(승인/정원), 상태 뱃지\n   - 링크 복사 버튼 (navigator.clipboard.writeText)\n   - 주최자일 때 수정/삭제 버튼\n5. app/protected/events/[id]/_components/members-tab.tsx 생성:\n   - 승인된 참여자 수 / 정원 표시\n   - 멤버 목록 (이름, 상태 뱃지, 신청일)\n   - 주최자: 각 멤버별 승인/거절 버튼\n   - 비승인 참여자(본인): 참여 신청 버튼\n6. 나머지 탭 placeholder 컴포넌트:\n   - announcements-tab.tsx, carpool-tab.tsx, settlement-tab.tsx (빈 '준비 중' UI)\n7. tasks/004-event-detail-ui.md 생성\n8. Playwright MCP로 상세 페이지 검토",
+      "verificationCriteria": "1. URL ?tab=members 파라미터로 탭 상태 유지 (새로고침 후에도)\n2. 탭 전환 시 URL 변경 확인\n3. 링크 복사 버튼 동작\n4. 주최자 역할: 승인/거절 버튼 표시, 수정/삭제 버튼 표시\n5. 참여자 역할: 참여 신청 버튼 표시\n6. 참여자 상태 뱃지(pending/approved/rejected) 표시\n7. Mock 역할 토글로 두 역할 전환 확인\n8. 모바일 반응형 확인\n9. Playwright 스냅샷 검토 완료\n10. TypeScript 타입 오류 없음",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    },
+    {
+      "id": "5630d338-3e0c-42bb-b704-2c30c389573c",
+      "name": "Task 005: DB 마이그레이션 - events, event_members 테이블 + RLS",
+      "description": "Supabase MCP로 events, event_members 테이블 생성, RLS 정책 설정, TypeScript 타입 재생성.\n\n수락 기준:\n- events 테이블: id(uuid), host_id(uuid→profiles), title, description, location, start_at(timestamptz), capacity(int), status(text CHECK), created_at\n- event_members 테이블: id(uuid), event_id(uuid→events), user_id(uuid→profiles), status(text CHECK), joined_at\n- RLS: events(로그인 사용자 읽기, host_id만 쓰기), event_members(주최자/본인 읽기, 본인만 쓰기)\n- TypeScript 타입 재생성 완료\n- 편의 타입 추가 완료",
+      "notes": "profiles 테이블이 이미 존재함을 확인 후 REFERENCES 설정. host_id의 ON DELETE 정책: CASCADE(호스트 탈퇴 시 이벤트 삭제) 또는 RESTRICT 선택. event_members에 UNIQUE(event_id, user_id) 제약으로 중복 신청 방지.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "11e4e2c0-4756-4aab-aac4-1a52d487d02f"
+        }
+      ],
+      "createdAt": "2026-03-20T07:31:29.069Z",
+      "updatedAt": "2026-03-20T07:31:29.069Z",
+      "relatedFiles": [
+        {
+          "path": "types/database.types.ts",
+          "type": "TO_MODIFY",
+          "description": "Supabase 자동 생성 타입 + 편의 타입 추가"
+        },
+        {
+          "path": "tasks/005-db-migration.md",
+          "type": "CREATE",
+          "description": "Task 005 명세 파일"
+        },
+        {
+          "path": "shrimp-rules.md",
+          "type": "REFERENCE",
+          "description": "DB 마이그레이션 규칙"
+        }
+      ],
+      "implementationGuide": "1. mcp__supabase__apply_migration 실행:\n   SQL:\n   - CREATE TABLE events (id uuid DEFAULT gen_random_uuid() PRIMARY KEY, host_id uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL, title text NOT NULL, description text, location text NOT NULL, start_at timestamptz NOT NULL, capacity int NOT NULL CHECK (capacity > 0), status text NOT NULL DEFAULT 'open' CHECK (status IN ('open','closed','cancelled')), created_at timestamptz DEFAULT now() NOT NULL);\n   - CREATE TABLE event_members (id uuid DEFAULT gen_random_uuid() PRIMARY KEY, event_id uuid REFERENCES events(id) ON DELETE CASCADE NOT NULL, user_id uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL, status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')), joined_at timestamptz DEFAULT now() NOT NULL, UNIQUE(event_id, user_id));\n   - ALTER TABLE events ENABLE ROW LEVEL SECURITY;\n   - ALTER TABLE event_members ENABLE ROW LEVEL SECURITY;\n   - RLS 정책:\n     events READ: FOR SELECT USING (auth.role() = 'authenticated')\n     events WRITE: FOR ALL USING (host_id = auth.uid())\n     event_members READ: FOR SELECT USING (user_id = auth.uid() OR event_id IN (SELECT id FROM events WHERE host_id = auth.uid()))\n     event_members WRITE: FOR ALL USING (user_id = auth.uid())\n2. mcp__supabase__generate_typescript_types 실행 → types/database.types.ts 갱신\n3. types/database.types.ts 하단에 편의 타입 추가:\n   export type Event = Database['public']['Tables']['events']['Row']\n   export type EventInsert = Database['public']['Tables']['events']['Insert']\n   export type EventUpdate = Database['public']['Tables']['events']['Update']\n   export type EventMember = Database['public']['Tables']['event_members']['Row']\n   export type EventMemberInsert = Database['public']['Tables']['event_members']['Insert']\n   export type EventMemberUpdate = Database['public']['Tables']['event_members']['Update']\n4. tasks/005-db-migration.md 생성",
+      "verificationCriteria": "1. Supabase 대시보드에서 events, event_members 테이블 확인\n2. RLS 정책 활성화 확인\n3. status CHECK 제약조건 확인\n4. UNIQUE(event_id, user_id) 제약조건 확인\n5. types/database.types.ts 재생성 완료\n6. Event, EventInsert, EventUpdate, EventMember, EventMemberInsert, EventMemberUpdate 편의 타입 존재\n7. TypeScript 타입 오류 없음",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    },
+    {
+      "id": "a8fb4fba-5576-413b-8397-76fd9ce77328",
+      "name": "Task 006: 이벤트 CRUD API 연동",
+      "description": "Mock 데이터를 TanStack Query + Server Action 기반 실제 Supabase 데이터로 교체. 이벤트 CRUD, 참여 신청/승인/거절 Server Action 구현.\n\n수락 기준:\n- 이벤트 생성/수정/삭제 Server Action 동작\n- 대시보드에서 실제 이벤트 목록 로드\n- 참여 신청/승인/거절 Server Action 동작\n- TanStack Query로 캐시 무효화 및 재조회\n- Playwright E2E 테스트 통과",
+      "notes": "Server Action에서 supabase는 lib/supabase/server.ts의 createClient() 사용. getClaims()로 user id 획득. Client 훅에서는 supabase client 사용 또는 Server Action mutate. 에러는 {success: false, error: message} 형태로 통일. revalidatePath('/protected/events') 호출 후 redirect.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "90fc3721-6a4f-497c-80b7-cd0450c7c877"
+        },
+        {
+          "taskId": "5630d338-3e0c-42bb-b704-2c30c389573c"
+        }
+      ],
+      "createdAt": "2026-03-20T07:31:29.069Z",
+      "updatedAt": "2026-03-20T07:31:29.069Z",
+      "relatedFiles": [
+        {
+          "path": "app/protected/events/actions.ts",
+          "type": "CREATE",
+          "description": "이벤트 Server Actions"
+        },
+        {
+          "path": "hooks/use-events.ts",
+          "type": "CREATE",
+          "description": "이벤트 TanStack Query 훅"
+        },
+        {
+          "path": "app/protected/events/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "Mock → 실제 데이터"
+        },
+        {
+          "path": "app/protected/events/new/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "Server Action 연동"
+        },
+        {
+          "path": "app/protected/events/[id]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "실제 데이터 + 역할 판별"
+        },
+        {
+          "path": "app/protected/events/[id]/edit/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "Server Action 연동"
+        },
+        {
+          "path": "lib/mock-data.ts",
+          "type": "TO_MODIFY",
+          "description": "Mock 데이터 제거, 타입만 유지"
+        },
+        {
+          "path": "types/database.types.ts",
+          "type": "REFERENCE",
+          "description": "DB 타입 참조"
+        },
+        {
+          "path": "lib/supabase/server.ts",
+          "type": "REFERENCE",
+          "description": "서버 Supabase 클라이언트"
+        },
+        {
+          "path": "tasks/006-event-api.md",
+          "type": "CREATE",
+          "description": "Task 006 명세 파일"
+        }
+      ],
+      "implementationGuide": "1. app/protected/events/actions.ts 생성 (Server Actions):\n   - createEvent(formData: EventFormValues): Promise<{success, error, data?}>\n     supabase insert into events (host_id = getClaims().sub)\n   - updateEvent(id, formData: EventFormValues): Promise<{success, error}>\n     supabase update events WHERE id AND host_id = auth.uid()\n   - deleteEvent(id): Promise<{success, error}>\n     supabase delete events WHERE id AND host_id = auth.uid()\n   - applyEvent(eventId): Promise<{success, error}>\n     supabase insert into event_members (user_id = auth.uid(), status='pending')\n   - updateMemberStatus(memberId, status: 'approved'|'rejected'): Promise<{success, error}>\n     supabase update event_members WHERE id AND event_id IN (events WHERE host_id = auth.uid())\n2. hooks/use-events.ts 생성 (TanStack Query):\n   - useMyEvents(): useQuery → fetch events WHERE host_id = me\n   - useJoinedEvents(): useQuery → fetch event_members WHERE user_id = me + events join\n   - useEventDetail(id): useQuery → fetch event + members\n   - useMutations: useCreateEvent, useUpdateEvent, useDeleteEvent, useApplyEvent, useUpdateMemberStatus\n3. app/protected/events/page.tsx 교체: Mock → useMyEvents(), useJoinedEvents()\n4. app/protected/events/new/page.tsx: onSubmit → useCreateEvent mutation\n5. app/protected/events/[id]/edit/page.tsx: useEventDetail + useUpdateEvent\n6. app/protected/events/[id]/page.tsx: useEventDetail + 실제 role 판별 (user.id === event.host_id)\n7. lib/mock-data.ts: 타입 정의만 유지, Mock 데이터 배열 제거\n8. tasks/006-event-api.md 생성\n9. Playwright E2E 테스트",
+      "verificationCriteria": "1. 이벤트 생성 → 대시보드에 목록 표시\n2. 이벤트 수정 → 상세 페이지 갱신\n3. 이벤트 삭제 → 목록에서 제거\n4. 참여 신청 → 참여자 목록에 pending 표시\n5. 주최자 승인 → approved 상태로 변경\n6. 주최자 거절 → rejected 상태로 변경\n7. 권한 없는 수정/삭제 시 에러 처리\n8. Playwright E2E 테스트 시나리오:\n   - 이벤트 생성 플로우\n   - 참여 신청 → 승인 플로우\n9. TypeScript 타입 오류 없음",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    },
+    {
+      "id": "e2a84484-ca82-4130-8586-0442886c6b47",
+      "name": "Task 007: 링크 공유 및 자동 참여 신청 기능",
+      "description": "이벤트 링크 공유 시 비로그인 처리, 로그인 후 자동 리디렉션 및 자동 참여 신청 구현.\n\n수락 기준:\n- 비로그인 사용자가 /protected/events/[id] 접근 시 로그인 페이지로 리디렉션 (redirect_to 파라미터 포함)\n- 로그인 완료 후 원래 이벤트 상세 페이지로 자동 이동\n- 이벤트 상세 페이지에서 ?autoJoin=true 파라미터 감지 시 자동 참여 신청\n- Playwright E2E 테스트 통과",
+      "notes": "proxy.ts의 리다이렉트 로직에서 URL 인코딩 필수. Google OAuth 로그인 시에도 redirect_to 처리 필요 (OAuth callback에서 처리). autoJoin 파라미터는 로그인 완료 후 redirect_to에 포함되어 전달됨. 중복 신청은 UNIQUE 제약으로 DB에서 방지되며, 에러를 graceful하게 처리.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "a8fb4fba-5576-413b-8397-76fd9ce77328"
+        }
+      ],
+      "createdAt": "2026-03-20T07:31:29.069Z",
+      "updatedAt": "2026-03-20T07:31:29.069Z",
+      "relatedFiles": [
+        {
+          "path": "lib/supabase/proxy.ts",
+          "type": "TO_MODIFY",
+          "description": "redirect_to 파라미터 포함 리디렉션"
+        },
+        {
+          "path": "app/auth/login/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "redirect_to 파라미터 처리"
+        },
+        {
+          "path": "app/auth/callback/route.ts",
+          "type": "TO_MODIFY",
+          "description": "OAuth callback에서 redirect_to 처리"
+        },
+        {
+          "path": "app/protected/events/[id]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "autoJoin 파라미터 처리"
+        },
+        {
+          "path": "app/protected/events/[id]/_components/event-header.tsx",
+          "type": "TO_MODIFY",
+          "description": "공유 링크에 autoJoin 파라미터 추가"
+        },
+        {
+          "path": "tasks/007-link-share.md",
+          "type": "CREATE",
+          "description": "Task 007 명세 파일"
+        }
+      ],
+      "implementationGuide": "1. lib/supabase/proxy.ts 확인: 비인증 접근 시 redirect_to 파라미터를 포함한 리디렉션 구현\n   현재 로직: redirect('/auth/login')\n   변경: redirect(`/auth/login?redirect_to=${encodedPath}`) — 이미 구현되어 있을 수 있음, 확인 필요\n2. app/auth/login/page.tsx 확인: redirect_to 파라미터 처리 — Supabase auth 완료 후 redirect_to로 이동\n   supabase.auth.signInWithPassword 성공 후 redirect(redirect_to || '/protected/events')\n3. app/protected/events/[id]/page.tsx 수정:\n   - searchParams에서 autoJoin 파라미터 읽기\n   - 로그인된 사용자이고 autoJoin=true이면 자동으로 applyEvent Server Action 호출\n   - 이미 신청/승인된 경우 중복 신청 방지\n4. app/protected/events/[id]/_components/event-header.tsx 수정:\n   - 링크 복사 버튼: /protected/events/[id]?autoJoin=true URL 복사\n5. tasks/007-link-share.md 생성\n6. Playwright E2E 테스트:\n   - 비로그인 링크 접근 → 로그인 → 자동 이동 → 자동 참여 신청 플로우",
+      "verificationCriteria": "1. 비로그인 상태에서 /protected/events/[id] 접근 → /auth/login?redirect_to=... 리디렉션\n2. 로그인 완료 후 redirect_to 경로로 자동 이동\n3. autoJoin=true 파라미터 시 자동 참여 신청 처리\n4. 이미 신청된 경우 중복 신청 없이 정상 페이지 표시\n5. Playwright E2E 시나리오:\n   - 링크 접근 → 비로그인 리디렉션 → 로그인 → 자동 이동 → 자동 참여 신청 → 참여자 목록 확인\n6. TypeScript 타입 오류 없음",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    },
+    {
+      "id": "fa71f96e-00f8-4103-b290-b42a62b90987",
+      "name": "Task 007-1: Phase 1 통합 테스트",
+      "description": "Phase 1 전체 기능의 통합 E2E 테스트. 주최자/참여자 플로우, RLS 정책 검증, 에러 핸들링 및 엣지 케이스.\n\n수락 기준:\n- 주최자 플로우 전체 E2E 테스트 통과\n- 참여자 플로우 전체 E2E 테스트 통과\n- RLS 정책 위반 접근 차단 확인\n- 정원 초과, 중복 신청, 취소된 이벤트 접근 에러 처리 확인",
+      "notes": "통합 테스트 중 발견된 버그는 즉시 수정. 정원 초과 제한은 Server Action에서 capacity 확인 로직 추가 필요할 수 있음. closed/cancelled 이벤트 참여 신청 제한도 Server Action에서 처리.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "e2a84484-ca82-4130-8586-0442886c6b47"
+        }
+      ],
+      "createdAt": "2026-03-20T07:31:29.069Z",
+      "updatedAt": "2026-03-20T07:31:29.069Z",
+      "relatedFiles": [
+        {
+          "path": "tasks/007-1-phase1-test.md",
+          "type": "CREATE",
+          "description": "Task 007-1 명세 파일"
+        },
+        {
+          "path": "app/protected/events/actions.ts",
+          "type": "TO_MODIFY",
+          "description": "정원 초과/closed 이벤트 신청 제한 로직 추가"
+        },
+        {
+          "path": "app/protected/events/[id]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "에러 핸들링 개선"
+        },
+        {
+          "path": "shrimp-rules.md",
+          "type": "REFERENCE",
+          "description": "개발 가이드라인"
+        }
+      ],
+      "implementationGuide": "Playwright MCP를 사용한 E2E 테스트 시나리오 실행:\n\n1. 주최자 플로우:\n   a. 로그인 (테스트 계정 A)\n   b. 이벤트 생성 (제목, 장소, 날짜, 정원=2)\n   c. 생성된 이벤트 상세 페이지 확인\n   d. 이벤트 수정 (제목 변경)\n   e. 이벤트 링크 복사 확인\n\n2. 참여자 플로우:\n   a. 다른 브라우저/세션에서 테스트 계정 B로 로그인\n   b. 공유 링크로 이벤트 접근\n   c. 참여 신청 버튼 클릭\n   d. pending 상태 확인\n   e. 계정 A(주최자)로 승인 처리\n   f. 계정 B에서 approved 상태 확인\n\n3. RLS 검증:\n   a. 계정 B가 이벤트 수정/삭제 시도 → 에러 또는 버튼 미노출 확인\n   b. 비로그인 접근 → 로그인 페이지 리디렉션 확인\n\n4. 엣지 케이스:\n   a. 정원 초과: 정원=1인 이벤트에 2명 승인 시도\n   b. 중복 신청: 이미 신청한 이벤트에 재신청 시도\n   c. cancelled 이벤트 접근: 상태 표시 확인\n   d. closed 이벤트 참여 신청: 처리 확인\n\n5. tasks/007-1-phase1-test.md 생성\n6. 발견된 버그 수정 후 재테스트",
+      "verificationCriteria": "1. 주최자 플로우 (생성→확인→수정) E2E 통과\n2. 참여자 플로우 (링크접근→신청→승인확인) E2E 통과\n3. 비로그인 접근 차단 확인\n4. 권한 없는 수정/삭제 차단 확인\n5. 정원 초과 신청 에러 처리\n6. 중복 신청 에러 처리\n7. cancelled/closed 이벤트 참여 신청 에러 처리\n8. 모바일(375px) 전체 플로우 반응형 확인\n9. npm run build 빌드 성공\n10. TypeScript 타입 오류 없음",
+      "analysisResult": "Phase 1: 이벤트 CRUD + 참여자 관리 핵심 루프 구현. UI-first 전략(Mock → DB 연동). 기술 스택: Next.js 16 App Router, React 19, TypeScript, TailwindCSS v4, shadcn/ui (new-york), TanStack Query v5, Zustand, nuqs, React Hook Form + Zod, Supabase. 핵심 규칙: proxy.ts(middleware.ts 금지), getClaims()(getUser 금지), any 타입 금지, 서버 클라이언트 전역 저장 금지, components/ui/ 직접 수정 금지."
+    }
+  ]
+}
