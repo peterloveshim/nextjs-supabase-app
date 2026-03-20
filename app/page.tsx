@@ -1,59 +1,83 @@
+import { Bell, CalendarDays, Users } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
 
-import { AuthButton } from "@/components/auth-button";
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { Hero } from "@/components/hero";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
+import { LandingHeader } from "@/components/landing-header";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+const FEATURES = [
+  {
+    icon: CalendarDays,
+    title: "이벤트 관리",
+    description:
+      "모임과 이벤트를 쉽게 만들고 관리하세요. 일정, 장소, 정원까지 한 곳에서.",
+    href: "/protected/events",
+  },
+  {
+    icon: Users,
+    title: "참여자 관리",
+    description: "참여 신청을 받고, 승인·거절을 간편하게 처리하세요.",
+    href: "/protected/events",
+  },
+  {
+    icon: Bell,
+    title: "실시간 알림",
+    description: "이벤트 변경사항과 참여 신청 현황을 알림으로 받아보세요.",
+    href: "/protected/notifications",
+  },
+];
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center">
-      <div className="flex w-full flex-1 flex-col items-center gap-20">
-        <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
-          <div className="flex w-full max-w-5xl items-center justify-between p-3 px-5 text-sm">
-            <div className="flex items-center gap-5 font-semibold">
-              <Link href={"/"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div>
-            </div>
-            {!hasEnvVars ? (
-              <EnvVarWarning />
-            ) : (
-              <Suspense>
-                <AuthButton />
-              </Suspense>
-            )}
-          </div>
-        </nav>
-        <div className="flex max-w-5xl flex-1 flex-col gap-20 p-5">
-          <Hero />
-          <main className="flex flex-1 flex-col gap-6 px-4">
-            <h2 className="mb-4 text-xl font-medium">Next steps</h2>
-            {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-          </main>
-        </div>
+    <div className="flex min-h-screen flex-col">
+      <LandingHeader />
 
-        <footer className="mx-auto flex w-full items-center justify-center gap-8 border-t py-16 text-center text-xs">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
+      {/* 히어로 섹션 */}
+      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-6 px-4 py-24 text-center">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          모임을 더 쉽게, <span className="text-primary">모임이음</span>
+        </h1>
+        <p className="max-w-xl text-lg text-muted-foreground">
+          이벤트 생성부터 참여자 관리, 알림까지. 모임 운영에 필요한 모든 것을 한
+          곳에서 해결하세요.
+        </p>
+        <div className="flex gap-3">
+          <Button asChild size="lg">
+            <Link href="/protected/events">시작하기</Link>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <Link href="/auth/login">로그인</Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* 기능 소개 섹션 */}
+      <section className="mx-auto w-full max-w-5xl px-4 pb-24">
+        <h2 className="mb-8 text-center text-2xl font-semibold">주요 기능</h2>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {FEATURES.map((feature) => (
+            <Card
+              key={feature.title}
+              className="transition-shadow hover:shadow-md"
             >
-              Supabase
-            </a>
-          </p>
-          <ThemeSwitcher />
-        </footer>
-      </div>
-    </main>
+              <CardHeader>
+                <feature.icon className="mb-2 h-8 w-8 text-primary" />
+                <CardTitle className="text-lg">{feature.title}</CardTitle>
+                <CardDescription>{feature.description}</CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
+        © 2026 모임이음. All rights reserved.
+      </footer>
+    </div>
   );
 }
