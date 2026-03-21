@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
+import { ImageUpload } from "@/components/events/image-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -53,6 +54,8 @@ type EventFormProps = {
   onSubmit: (data: EventFormValues) => void;
   // 제출 중 여부 (버튼 비활성화)
   isSubmitting?: boolean;
+  // 이미지 업로드를 위한 현재 사용자 ID
+  userId: string;
 };
 
 export function EventForm({
@@ -60,6 +63,7 @@ export function EventForm({
   isEdit = false,
   onSubmit,
   isSubmitting = false,
+  userId,
 }: EventFormProps) {
   const router = useRouter();
 
@@ -176,17 +180,18 @@ export function EventForm({
           )}
         />
 
-        {/* 이미지 URL (선택) */}
+        {/* 이미지 업로드 (선택) */}
         <FormField
           control={form.control}
           name="imageUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>이미지 URL</FormLabel>
+              <FormLabel>이미지</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="https://example.com/image.jpg (선택)"
-                  {...field}
+                <ImageUpload
+                  value={field.value ?? null}
+                  onChange={(url) => field.onChange(url ?? "")}
+                  userId={userId}
                 />
               </FormControl>
               <FormMessage />

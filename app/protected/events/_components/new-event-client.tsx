@@ -2,13 +2,15 @@
 
 import { toast } from "sonner";
 
-import { useCreateEvent } from "@/hooks/use-events";
+import { useCreateEvent, useCurrentUserId } from "@/hooks/use-events";
 import type { EventFormValues } from "@/lib/validations/event";
 
 import { EventForm } from "./event-form";
 
 export function NewEventClient() {
   const { mutate: createEvent, isPending } = useCreateEvent();
+  // 이미지 업로드 경로 생성을 위한 현재 사용자 ID
+  const { data: userId } = useCurrentUserId();
 
   // 이벤트 생성 제출 처리
   const handleSubmit = (data: EventFormValues) => {
@@ -27,7 +29,13 @@ export function NewEventClient() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <h1 className="text-2xl font-bold">이벤트 만들기</h1>
-      <EventForm onSubmit={handleSubmit} isSubmitting={isPending} />
+      {userId && (
+        <EventForm
+          onSubmit={handleSubmit}
+          isSubmitting={isPending}
+          userId={userId}
+        />
+      )}
     </div>
   );
 }

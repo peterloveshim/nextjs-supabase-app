@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  useCurrentUserId,
   useDeleteEvent,
   useEventDetail,
   useUpdateEvent,
@@ -25,6 +26,8 @@ export function EditEventClient({ id }: EditEventClientProps) {
   const { data: event, isLoading } = useEventDetail(id);
   const { mutate: updateEvent, isPending: isUpdating } = useUpdateEvent(id);
   const { mutate: deleteEvent, isPending: isDeleting } = useDeleteEvent();
+  // 이미지 업로드 경로 생성을 위한 현재 사용자 ID
+  const { data: userId } = useCurrentUserId();
 
   // 이벤트 수정 제출 처리
   const handleSubmit = (data: EventFormValues) => {
@@ -102,12 +105,15 @@ export function EditEventClient({ id }: EditEventClientProps) {
         </Button>
       </div>
 
-      <EventForm
-        defaultValues={defaultValues}
-        isEdit
-        onSubmit={handleSubmit}
-        isSubmitting={isUpdating}
-      />
+      {userId && (
+        <EventForm
+          defaultValues={defaultValues}
+          isEdit
+          onSubmit={handleSubmit}
+          isSubmitting={isUpdating}
+          userId={userId}
+        />
+      )}
 
       {/* 삭제 확인 다이얼로그 */}
       <DeleteConfirmDialog
