@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { AuthButton } from "@/components/auth-button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_LINKS = [
   { href: "/protected/events", label: "이벤트" },
@@ -11,7 +11,7 @@ const NAV_LINKS = [
 
 export function LandingHeader() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         {/* 로고 */}
         <Link href="/" className="text-lg font-bold">
@@ -24,7 +24,7 @@ export function LandingHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
             >
               {link.label}
             </Link>
@@ -33,7 +33,7 @@ export function LandingHeader() {
 
         {/* 우측 영역 */}
         <div className="flex items-center gap-2">
-          <ThemeSwitcher />
+          <ThemeToggle />
           <Suspense>
             <AuthButton />
           </Suspense>

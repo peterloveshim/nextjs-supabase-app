@@ -4,6 +4,7 @@ import { Bell, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,7 +45,7 @@ function NavLinks({
           href={link.href}
           onClick={onClick}
           className={cn(
-            "text-sm font-medium transition-colors hover:text-foreground",
+            "hover:text-foreground text-sm font-medium transition-colors",
             pathname.startsWith(link.href)
               ? "text-foreground"
               : "text-muted-foreground"
@@ -67,10 +68,10 @@ export function HeaderNav({ email }: { email: string }) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         {/* 로고 */}
-        <Link href="/protected/events" className="text-lg font-bold">
+        <Link href="/" className="text-lg font-bold">
           모임이음
         </Link>
 
@@ -79,6 +80,9 @@ export function HeaderNav({ email }: { email: string }) {
 
         {/* 우측 액션 영역 */}
         <div className="flex items-center gap-2">
+          {/* 테마 토글 버튼 */}
+          <ThemeToggle />
+
           {/* 알림 아이콘 */}
           <Button variant="ghost" size="icon" asChild>
             <Link href="/protected/notifications" aria-label="알림">
@@ -91,7 +95,7 @@ export function HeaderNav({ email }: { email: string }) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="hidden h-auto px-2 py-1 text-sm text-muted-foreground hover:text-foreground md:flex"
+                className="text-muted-foreground hover:text-foreground hidden h-auto px-2 py-1 text-sm md:flex"
               >
                 {email}
               </Button>
@@ -128,7 +132,7 @@ export function HeaderNav({ email }: { email: string }) {
               {/* 모바일 이메일 + 로그아웃 */}
               <Separator className="my-4" />
               <div className="flex flex-col gap-3">
-                <span className="truncate text-sm text-muted-foreground">
+                <span className="text-muted-foreground truncate text-sm">
                   {email}
                 </span>
                 <Button
