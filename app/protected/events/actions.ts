@@ -220,6 +220,13 @@ export async function createEvent(
     return { success: false, error: error.message };
   }
 
+  // 이벤트 생성자를 자동으로 승인된 참여자로 추가
+  await supabase.from("event_members").insert({
+    event_id: data.id,
+    user_id: userId,
+    status: "approved",
+  });
+
   revalidatePath("/protected/events");
   return { success: true, data: { id: data.id } };
 }
@@ -266,6 +273,7 @@ export async function updateEvent(
 /**
  * 이벤트 삭제
  * host_id = auth.uid() 조건으로 권한 확인
+ * 이벤트 삭제 시 연결된 Storage 이미지도 함께 삭제
  */
 export async function deleteEvent(id: string): Promise<ActionResult> {
   const supabase = await createClient();
@@ -276,6 +284,14 @@ export async function deleteEvent(id: string): Promise<ActionResult> {
     return { success: false, error: "로그인이 필요합니다." };
   }
 
+  // 삭제 전 이미지 URL 조회 (Storage 정리용)
+  const { data: event } = await supabase
+    .from("events")
+    .select("image_url")
+    .eq("id", id)
+    .eq("host_id", userId)
+    .single();
+
   const { error } = await supabase
     .from("events")
     .delete()
@@ -284,6 +300,20 @@ export async function deleteEvent(id: string): Promise<ActionResult> {
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  // event-images 버킷 내 이미지 삭제 (실패해도 이벤트 삭제는 성공으로 처리)
+  if (event?.image_url) {
+    const imageUrl = event.image_url;
+    const bucketMarker = "/event-images/";
+    const markerIndex = imageUrl.indexOf(bucketMarker);
+    if (markerIndex !== -1) {
+      // URL 인코딩된 문자(한글, 공백 등)를 디코딩하여 실제 스토리지 경로로 변환
+      const rawPath = imageUrl.slice(markerIndex + bucketMarker.length);
+      // 쿼리스트링 제거 후 디코딩
+      const storagePath = decodeURIComponent(rawPath.split("?")[0]);
+      await supabase.storage.from("event-images").remove([storagePath]);
+    }
   }
 
   revalidatePath("/protected/events");
