@@ -43,15 +43,15 @@ export default async function Home() {
       <LandingHeader />
 
       {/* 히어로 섹션 */}
-      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-6 px-4 py-24 text-center">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-6 px-4 py-16 text-center md:py-24">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
           모임을 더 쉽게, <span className="text-primary">모임이음</span>
         </h1>
-        <p className="max-w-xl text-lg text-muted-foreground">
+        <p className="text-muted-foreground max-w-xl text-base sm:text-lg">
           이벤트 생성부터 참여자 관리, 알림까지. 모임 운영에 필요한 모든 것을 한
           곳에서 해결하세요.
         </p>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
             <Link href="/protected/events">시작하기</Link>
           </Button>
@@ -64,16 +64,16 @@ export default async function Home() {
       </section>
 
       {/* 기능 소개 섹션 */}
-      <section className="mx-auto w-full max-w-5xl px-4 pb-24">
+      <section className="mx-auto w-full max-w-5xl px-4 pb-16 md:pb-24">
         <h2 className="mb-8 text-center text-2xl font-semibold">주요 기능</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           {FEATURES.map((feature) => (
             <Card
               key={feature.title}
               className="transition-shadow hover:shadow-md"
             >
               <CardHeader>
-                <feature.icon className="mb-2 h-8 w-8 text-primary" />
+                <feature.icon className="text-primary mb-2 h-8 w-8" />
                 <CardTitle className="text-lg">{feature.title}</CardTitle>
                 <CardDescription>{feature.description}</CardDescription>
               </CardHeader>
@@ -82,7 +82,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
+      <footer className="text-muted-foreground border-t py-8 text-center text-sm">
         © 2026 모임이음. All rights reserved.
       </footer>
     </div>

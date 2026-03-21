@@ -31,10 +31,8 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // 로그인 성공 후 이동 경로: redirect_to 파라미터 → 기본 이벤트 목록 페이지
-  const destination = redirectTo
-    ? decodeURIComponent(redirectTo)
-    : "/protected/events";
+  // 로그인 성공 후 이동 경로: redirect_to 파라미터 → 기본 홈 페이지
+  const destination = redirectTo ? decodeURIComponent(redirectTo) : "/";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,10 +59,8 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <CardTitle className="text-2xl">로그인</CardTitle>
+          <CardDescription>이메일로 로그인하세요</CardDescription>
         </CardHeader>
         <CardContent>
           {/* 구글 OAuth 로그인 버튼 */}
@@ -73,7 +69,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
           {/* 구분선: 소셜 로그인과 이메일 폼 사이 */}
           <div className="my-4 flex items-center gap-3">
             <Separator className="flex-1" />
-            <span className="text-xs text-muted-foreground">
+            <span className="text-muted-foreground text-xs">
               또는 이메일로 계속
             </span>
             <Separator className="flex-1" />
@@ -82,7 +78,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">이메일</Label>
                 <Input
                   id="email"
                   type="email"
@@ -94,12 +90,12 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">비밀번호</Label>
                   <Link
                     href="/auth/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
-                    Forgot your password?
+                    비밀번호를 잊으셨나요?
                   </Link>
                 </div>
                 <Input
@@ -112,16 +108,16 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? "로그인 중..." : "로그인"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
+              계정이 없으신가요?{" "}
               <Link
                 href="/auth/sign-up"
                 className="underline underline-offset-4"
               >
-                Sign up
+                회원가입
               </Link>
             </div>
           </form>

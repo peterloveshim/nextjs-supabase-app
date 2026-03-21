@@ -11,8 +11,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   // Google OAuth에서 전달받은 인증 코드
   const code = searchParams.get("code");
-  // 인증 성공 후 이동할 경로 (기본값: /protected/events)
-  const next = searchParams.get("next") ?? "/protected/events";
+  // 인증 성공 후 이동할 경로 (기본값: /)
+  const next = searchParams.get("next") ?? "/";
 
   if (code) {
     const supabase = await createClient();
