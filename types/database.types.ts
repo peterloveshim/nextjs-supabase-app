@@ -14,6 +14,129 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          event_id: string
+          id: string
+          title: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          event_id: string
+          id?: string
+          title: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_members: {
+        Row: {
+          carpool_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          carpool_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          carpool_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_members_carpool_id_fkey"
+            columns: ["carpool_id"]
+            isOneToOne: false
+            referencedRelation: "carpools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpools: {
+        Row: {
+          created_at: string
+          departure_location: string
+          driver_id: string
+          event_id: string
+          id: string
+          note: string | null
+          seats: number
+        }
+        Insert: {
+          created_at?: string
+          departure_location: string
+          driver_id: string
+          event_id: string
+          id?: string
+          note?: string | null
+          seats: number
+        }
+        Update: {
+          created_at?: string
+          departure_location?: string
+          driver_id?: string
+          event_id?: string
+          id?: string
+          note?: string | null
+          seats?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpools_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpools_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_members: {
         Row: {
           event_id: string
@@ -60,6 +183,7 @@ export type Database = {
           description: string | null
           host_id: string
           id: string
+          image_url: string | null
           location: string
           start_at: string
           status: string
@@ -71,6 +195,7 @@ export type Database = {
           description?: string | null
           host_id: string
           id?: string
+          image_url?: string | null
           location: string
           start_at: string
           status?: string
@@ -82,6 +207,7 @@ export type Database = {
           description?: string | null
           host_id?: string
           id?: string
+          image_url?: string | null
           location?: string
           start_at?: string
           status?: string
@@ -135,7 +261,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_approved_member: { Args: { p_event_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -282,3 +408,11 @@ export type EventMemberUpdate = Database['public']['Tables']['event_members']['U
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
 export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+export type Announcement = Database['public']['Tables']['announcements']['Row']
+export type AnnouncementInsert = Database['public']['Tables']['announcements']['Insert']
+export type AnnouncementUpdate = Database['public']['Tables']['announcements']['Update']
+export type Carpool = Database['public']['Tables']['carpools']['Row']
+export type CarpoolInsert = Database['public']['Tables']['carpools']['Insert']
+export type CarpoolUpdate = Database['public']['Tables']['carpools']['Update']
+export type CarpoolMember = Database['public']['Tables']['carpool_members']['Row']
+export type CarpoolMemberInsert = Database['public']['Tables']['carpool_members']['Insert']

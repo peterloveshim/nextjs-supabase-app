@@ -16,6 +16,8 @@ export type EventListItem = {
   approvedCount: number;
   // 내가 참여 신청한 경우의 상태 (joined events 탭에서 사용)
   myStatus?: MemberStatus;
+  // 이벤트 대표 이미지 URL (없으면 null)
+  imageUrl: string | null;
 };
 
 // 참여자 타입 (DB Row + 프로필 조인)
@@ -39,4 +41,6 @@ export type EventDetailView = {
   capacity: number;
   status: EventStatus;
   members: EventMemberWithProfile[];
+  // 이벤트 대표 이미지 URL (없으면 null)
+  imageUrl: string | null;
 };

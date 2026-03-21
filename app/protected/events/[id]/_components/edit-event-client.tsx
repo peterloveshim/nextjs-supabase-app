@@ -85,6 +85,7 @@ export function EditEventClient({ id }: EditEventClientProps) {
     startAt: event.startAt,
     capacity: event.capacity,
     status: event.status,
+    imageUrl: event.imageUrl,
   };
 
   return (

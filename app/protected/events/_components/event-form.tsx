@@ -46,6 +46,7 @@ type EventFormProps = {
     startAt?: Date | string;
     capacity?: number;
     status?: "open" | "closed" | "cancelled";
+    imageUrl?: string | null;
   };
   // 수정 모드 여부 (상태 셀렉트 표시)
   isEdit?: boolean;
@@ -73,6 +74,7 @@ export function EventForm({
       startAt: toDatetimeLocal(defaultValues?.startAt),
       capacity: defaultValues?.capacity ?? 10,
       status: defaultValues?.status,
+      imageUrl: defaultValues?.imageUrl ?? "",
     },
   });
 
@@ -167,6 +169,24 @@ export function EventForm({
                   placeholder="1 ~ 100"
                   {...field}
                   onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* 이미지 URL (선택) */}
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>이미지 URL</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://example.com/image.jpg (선택)"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />

@@ -25,7 +25,7 @@ export async function fetchMyEvents(): Promise<EventListItem[]> {
 
   const { data: events, error } = await supabase
     .from("events")
-    .select("id, title, location, start_at, capacity, status")
+    .select("id, title, location, start_at, capacity, status, image_url")
     .eq("host_id", userId)
     .order("start_at", { ascending: false });
 
@@ -51,6 +51,7 @@ export async function fetchMyEvents(): Promise<EventListItem[]> {
     capacity: e.capacity,
     status: e.status as EventStatus,
     approvedCount: countMap[e.id] ?? 0,
+    imageUrl: e.image_url,
   }));
 }
 
@@ -66,7 +67,7 @@ export async function fetchJoinedEvents(): Promise<EventListItem[]> {
   const { data: members, error } = await supabase
     .from("event_members")
     .select(
-      "id, status, events(id, title, location, start_at, capacity, status)"
+      "id, status, events(id, title, location, start_at, capacity, status, image_url)"
     )
     .eq("user_id", userId)
     .order("joined_at", { ascending: false });
@@ -80,6 +81,7 @@ export async function fetchJoinedEvents(): Promise<EventListItem[]> {
     start_at: string;
     capacity: number;
     status: string;
+    image_url: string | null;
   };
 
   const eventIds = members
@@ -110,6 +112,7 @@ export async function fetchJoinedEvents(): Promise<EventListItem[]> {
         status: event.status as EventStatus,
         approvedCount: countMap[event.id] ?? 0,
         myStatus: m.status as MemberStatus,
+        imageUrl: event.image_url,
       };
     });
 }
@@ -125,7 +128,7 @@ export async function fetchEventDetail(
   const { data: event, error: eventError } = await supabase
     .from("events")
     .select(
-      "id, host_id, title, description, location, start_at, capacity, status"
+      "id, host_id, title, description, location, start_at, capacity, status, image_url"
     )
     .eq("id", id)
     .single();
@@ -163,6 +166,7 @@ export async function fetchEventDetail(
     capacity: event.capacity,
     status: event.status as EventStatus,
     members: memberList,
+    imageUrl: event.image_url,
   };
 }
 
@@ -207,6 +211,7 @@ export async function createEvent(
       start_at: new Date(values.startAt).toISOString(),
       capacity: values.capacity,
       status: values.status ?? "open",
+      image_url: values.imageUrl || null,
     })
     .select("id")
     .single();
@@ -244,6 +249,7 @@ export async function updateEvent(
       start_at: new Date(values.startAt).toISOString(),
       capacity: values.capacity,
       status: values.status ?? "open",
+      image_url: values.imageUrl || null,
     })
     .eq("id", id)
     .eq("host_id", userId);

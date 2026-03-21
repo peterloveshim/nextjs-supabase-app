@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
@@ -82,37 +83,58 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Card
-      className="cursor-pointer transition-shadow hover:shadow-md"
+      className="cursor-pointer overflow-hidden transition-shadow hover:shadow-md"
       onClick={handleClick}
     >
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="line-clamp-2 text-base">
-            {event.title}
-          </CardTitle>
-          <div className="flex shrink-0 flex-col items-end gap-1">
-            {getStatusBadge(event.status)}
-            {event.myStatus && getMemberStatusBadge(event.myStatus)}
-          </div>
+      <div className="flex">
+        {/* 좌측: 텍스트 콘텐츠 */}
+        <div className="min-w-0 flex-1">
+          <CardHeader className="pb-2">
+            <div className="flex items-start justify-between gap-2">
+              <CardTitle className="line-clamp-2 text-base">
+                {event.title}
+              </CardTitle>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                {getStatusBadge(event.status)}
+                {event.myStatus && getMemberStatusBadge(event.myStatus)}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-1 text-sm text-muted-foreground">
+            {/* 장소 */}
+            <p className="line-clamp-1">
+              <span className="font-medium text-foreground">장소</span>{" "}
+              {event.location}
+            </p>
+            {/* 날짜 */}
+            <p>
+              <span className="font-medium text-foreground">일시</span>{" "}
+              {formatDate(event.startAt)}
+            </p>
+            {/* 정원 */}
+            <p>
+              <span className="font-medium text-foreground">정원</span>{" "}
+              {event.approvedCount} / {event.capacity}명
+            </p>
+          </CardContent>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-1 text-sm text-muted-foreground">
-        {/* 장소 */}
-        <p className="line-clamp-1">
-          <span className="font-medium text-foreground">장소</span>{" "}
-          {event.location}
-        </p>
-        {/* 날짜 */}
-        <p>
-          <span className="font-medium text-foreground">일시</span>{" "}
-          {formatDate(event.startAt)}
-        </p>
-        {/* 정원 */}
-        <p>
-          <span className="font-medium text-foreground">정원</span>{" "}
-          {event.approvedCount} / {event.capacity}명
-        </p>
-      </CardContent>
+
+        {/* 우측: 이미지 썸네일 (md 미만 숨김, 카드 너비의 40%) */}
+        <div className="hidden md:block md:w-[40%] md:shrink-0">
+          {event.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={event.imageUrl}
+              alt={event.title}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-muted">
+              <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+          )}
+        </div>
+      </div>
     </Card>
   );
 }

@@ -15,6 +15,14 @@ export const eventFormSchema = z.object({
     .min(1, "정원은 최소 1명 이상이어야 합니다.")
     .max(100, "정원은 최대 100명까지 입력 가능합니다."),
   status: z.enum(["open", "closed", "cancelled"]).optional(),
+  // 이미지 URL (선택): 빈 문자열이거나 http(s)://로 시작하는 URL
+  imageUrl: z
+    .string()
+    .refine(
+      (val) => !val || val.startsWith("http://") || val.startsWith("https://"),
+      "http:// 또는 https://로 시작하는 URL을 입력해주세요."
+    )
+    .optional(),
 });
 
 // 폼 필드 타입 (useForm에서 사용)
