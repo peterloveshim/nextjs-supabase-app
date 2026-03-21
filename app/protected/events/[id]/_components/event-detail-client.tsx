@@ -54,6 +54,13 @@ export function EventDetailClient({
   // 현재 사용자가 주최자인지 판별
   const isHost = !!currentUserId && !!event && currentUserId === event.hostId;
 
+  // 현재 사용자가 승인된 참여자인지 판별
+  const isApprovedMember =
+    !!currentUserId &&
+    !!event &&
+    event.members.find((m) => m.userId === currentUserId)?.status ===
+      "approved";
+
   // Mutation 훅
   const { mutate: deleteEvent, isPending: isDeleting } = useDeleteEvent();
   const { mutate: applyEvent, isPending: isApplying } = useApplyEvent(id);
@@ -200,7 +207,11 @@ export function EventDetailClient({
         </TabsList>
 
         <TabsContent value="announcements" className="mt-4">
-          <AnnouncementsTab />
+          <AnnouncementsTab
+            eventId={id}
+            isHost={isHost}
+            isApprovedMember={isApprovedMember}
+          />
         </TabsContent>
 
         <TabsContent value="members" className="mt-4">
@@ -216,7 +227,11 @@ export function EventDetailClient({
         </TabsContent>
 
         <TabsContent value="carpool" className="mt-4">
-          <CarpoolTab />
+          <CarpoolTab
+            eventId={id}
+            isEligible={isHost || isApprovedMember}
+            currentUserId={currentUserId ?? undefined}
+          />
         </TabsContent>
 
         <TabsContent value="settlement" className="mt-4">

@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 /**
  * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each
  * function when using it.
+ *
+ * NOTE: getAll/setAll 방식으로 chunked 쿠키를 처리한다.
  */
 export async function createClient() {
   const cookieStore = await cookies();
