@@ -100,37 +100,37 @@ export function EventCard({ event }: EventCardProps) {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-1 text-sm text-muted-foreground">
+          <CardContent className="text-muted-foreground space-y-1 text-sm">
             {/* 장소 */}
             <p className="line-clamp-1">
-              <span className="font-medium text-foreground">장소</span>{" "}
+              <span className="text-foreground font-medium">장소</span>{" "}
               {event.location}
             </p>
             {/* 날짜 */}
             <p>
-              <span className="font-medium text-foreground">일시</span>{" "}
+              <span className="text-foreground font-medium">일시</span>{" "}
               {formatDate(event.startAt)}
             </p>
             {/* 정원 */}
             <p>
-              <span className="font-medium text-foreground">정원</span>{" "}
+              <span className="text-foreground font-medium">정원</span>{" "}
               {event.approvedCount} / {event.capacity}명
             </p>
           </CardContent>
         </div>
 
         {/* 우측: 이미지 썸네일 (md 미만 숨김, 카드 너비의 40%) */}
-        <div className="hidden md:block md:w-[40%] md:shrink-0">
+        <div className="relative hidden md:block md:w-[40%] md:shrink-0">
           {event.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={event.imageUrl}
               alt={event.title}
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
+            <div className="bg-muted absolute inset-0 flex items-center justify-center">
+              <ImageIcon className="text-muted-foreground/40 h-8 w-8" />
             </div>
           )}
         </div>
