@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, LogOut, Menu } from "lucide-react";
+import { Bell, LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 const NAV_LINKS = [
   { href: "/protected/events", label: "이벤트" },
   { href: "/protected/notifications", label: "알림" },
+  { href: "/protected/profile", label: "프로필" },
 ];
 
 function NavLinks({
@@ -104,6 +105,12 @@ export function HeaderNav({ email }: { email?: string }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild className="cursor-pointer gap-2">
+                    <Link href="/protected/profile">
+                      <User className="h-4 w-4" />
+                      프로필
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className="cursor-pointer gap-2"
