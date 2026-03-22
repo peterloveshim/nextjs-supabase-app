@@ -29,6 +29,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuggestGoogle, setIsSuggestGoogle] = useState(false);
   const router = useRouter();
 
   // 로그인 성공 후 이동 경로: redirect_to 파라미터 → 기본 홈 페이지
@@ -39,12 +40,20 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
+    setIsSuggestGoogle(false);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      // "Invalid login credentials": 단순 오타이거나 Google로만 가입된 계정일 수 있음
+      if (error?.message === "Invalid login credentials") {
+        setIsSuggestGoogle(true);
+        return;
+      }
+
       if (error) throw error;
       // 로그인 성공: redirect_to 경로 또는 기본 이벤트 목록으로 이동
       router.push(destination);
@@ -106,6 +115,20 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
+              {isSuggestGoogle && (
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    로그인에 실패했습니다. 비밀번호를 다시 확인하거나, Google
+                    계정으로 가입하셨다면 Google 로그인을 이용해 주세요.
+                  </p>
+                  <div className="mt-3">
+                    <GoogleLoginButton
+                      label="Google로 로그인"
+                      redirectTo={redirectTo}
+                    />
+                  </div>
+                </div>
+              )}
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "로그인 중..." : "로그인"}

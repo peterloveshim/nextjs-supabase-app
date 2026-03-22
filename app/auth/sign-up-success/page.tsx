@@ -1,7 +1,11 @@
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -22,6 +26,11 @@ export default function Page() {
                 계정을 인증해 주세요.
               </p>
             </CardContent>
+            <CardFooter>
+              <Button asChild className="w-full">
+                <Link href="/">홈으로 돌아가기</Link>
+              </Button>
+            </CardFooter>
           </Card>
         </div>
       </div>

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn, generateKoreanUsername } from "@/lib/utils";
 
 export function SignUpForm({
   className,
@@ -28,6 +28,7 @@ export function SignUpForm({
   const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDuplicateEmail, setIsDuplicateEmail] = useState(false);
   const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -35,6 +36,7 @@ export function SignUpForm({
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
+    setIsDuplicateEmail(false);
 
     if (password !== repeatPassword) {
       setError("비밀번호가 일치하지 않습니다.");
@@ -43,13 +45,29 @@ export function SignUpForm({
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: generateKoreanUsername(),
+          },
         },
       });
+
+      // 가짜 성공 감지: 이메일 확인 활성화 시 이미 가입된 이메일은 identities 배열이 비어있음
+      if (!error && data.user?.identities?.length === 0) {
+        setIsDuplicateEmail(true);
+        return;
+      }
+
+      // 이메일 확인 비활성화 시 실제 에러로 이미 가입된 이메일 감지
+      if (error?.message?.toLowerCase().includes("already registered")) {
+        setIsDuplicateEmail(true);
+        return;
+      }
+
       if (error) throw error;
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
@@ -116,6 +134,17 @@ export function SignUpForm({
                   onChange={(e) => setRepeatPassword(e.target.value)}
                 />
               </div>
+              {isDuplicateEmail && (
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    이미 가입된 이메일입니다. Google 계정으로 가입하셨다면
+                    Google 로그인을 이용해 주세요.
+                  </p>
+                  <div className="mt-3">
+                    <GoogleLoginButton label="Google로 로그인" />
+                  </div>
+                </div>
+              )}
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "가입 중..." : "회원가입"}
