@@ -34,6 +34,7 @@ export type EventMemberWithProfile = {
 export type EventDetailView = {
   id: string;
   hostId: string;
+  hostName: string | null;
   title: string;
   description: string | null;
   location: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, ImageIcon, Pencil, Trash2 } from "lucide-react";
+import { Copy, ImageIcon, Pencil, Trash2, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -89,25 +89,32 @@ export function EventHeader({
           {/* 상세 정보 */}
           <dl className="space-y-1 text-sm">
             <div className="flex gap-2">
-              <dt className="font-medium text-foreground">장소</dt>
+              <dt className="text-foreground font-medium">장소</dt>
               <dd className="text-muted-foreground">{event.location}</dd>
             </div>
             <div className="flex gap-2">
-              <dt className="font-medium text-foreground">일시</dt>
+              <dt className="text-foreground font-medium">일시</dt>
               <dd className="text-muted-foreground">
                 {formatDate(event.startAt)}
               </dd>
             </div>
             <div className="flex gap-2">
-              <dt className="font-medium text-foreground">정원</dt>
+              <dt className="text-foreground font-medium">정원</dt>
               <dd className="text-muted-foreground">
                 {approvedCount} / {event.capacity}명
               </dd>
             </div>
+            <div className="flex items-center gap-2">
+              <dt className="text-foreground font-medium">주최자</dt>
+              <dd className="text-muted-foreground flex items-center gap-1">
+                <User className="h-3.5 w-3.5" />
+                {event.hostName ?? "알 수 없음"}
+              </dd>
+            </div>
             {event.description && (
               <div className="pt-2">
-                <dt className="font-medium text-foreground">설명</dt>
-                <dd className="mt-1 whitespace-pre-line text-muted-foreground">
+                <dt className="text-foreground font-medium">설명</dt>
+                <dd className="text-muted-foreground mt-1 whitespace-pre-line">
                   {event.description}
                 </dd>
               </div>
@@ -147,8 +154,8 @@ export function EventHeader({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <ImageIcon className="h-12 w-12 text-muted-foreground/30" />
+            <div className="bg-muted flex h-full w-full items-center justify-center">
+              <ImageIcon className="text-muted-foreground/30 h-12 w-12" />
             </div>
           )}
         </div>
