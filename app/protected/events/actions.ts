@@ -135,6 +135,12 @@ export async function fetchEventDetail(
 
   if (eventError || !event) return null;
 
+  const { data: hostProfile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", event.host_id)
+    .single();
+
   const { data: members } = await supabase
     .from("event_members")
     .select("id, user_id, status, joined_at, profiles(full_name, email)")
@@ -159,6 +165,7 @@ export async function fetchEventDetail(
   return {
     id: event.id,
     hostId: event.host_id,
+    hostName: hostProfile?.full_name ?? null,
     title: event.title,
     description: event.description,
     location: event.location,
@@ -337,7 +344,7 @@ export async function applyEvent(eventId: string): Promise<ActionResult> {
   // 이벤트 상태 및 정원 확인
   const { data: event, error: eventError } = await supabase
     .from("events")
-    .select("id, status, capacity")
+    .select("id, host_id, status, capacity")
     .eq("id", eventId)
     .single();
 
@@ -372,6 +379,10 @@ export async function applyEvent(eventId: string): Promise<ActionResult> {
     .eq("user_id", userId)
     .single();
 
+  // 주최자 여부 확인 (주최자는 자동 승인)
+  const isHost = event.host_id === userId;
+  const applyStatus = isHost ? "approved" : "pending";
+
   if (existingMember) {
     if (existingMember.status === "pending") {
       return { success: false, error: "이미 참여 신청 중입니다." };
@@ -382,7 +393,7 @@ export async function applyEvent(eventId: string): Promise<ActionResult> {
     // rejected 상태면 재신청 허용 (기존 레코드 업데이트)
     const { error: updateError } = await supabase
       .from("event_members")
-      .update({ status: "pending" })
+      .update({ status: applyStatus })
       .eq("id", existingMember.id);
 
     if (updateError) {
@@ -397,7 +408,7 @@ export async function applyEvent(eventId: string): Promise<ActionResult> {
   const { error } = await supabase.from("event_members").insert({
     event_id: eventId,
     user_id: userId,
-    status: "pending",
+    status: applyStatus,
   });
 
   if (error) {
@@ -409,6 +420,64 @@ export async function applyEvent(eventId: string): Promise<ActionResult> {
   }
 
   revalidatePath(`/protected/events/${eventId}`);
+  return { success: true };
+}
+
+/**
+ * 참여 취소 (approved 상태인 멤버 삭제)
+ * - 본인: 자신의 참여를 취소 가능
+ * - 주최자: 모든 approved 멤버의 참여 취소 가능
+ */
+export async function cancelMembership(
+  memberId: string
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
+
+  if (!userId) {
+    return { success: false, error: "로그인이 필요합니다." };
+  }
+
+  // 멤버 조회
+  const { data: member, error: memberError } = await supabase
+    .from("event_members")
+    .select("id, user_id, event_id, status")
+    .eq("id", memberId)
+    .single();
+
+  if (memberError || !member) {
+    return { success: false, error: "참여자를 찾을 수 없습니다." };
+  }
+
+  if (member.status !== "approved") {
+    return { success: false, error: "승인된 참여자만 취소할 수 있습니다." };
+  }
+
+  // 본인이 아닌 경우 주최자 여부 확인
+  if (member.user_id !== userId) {
+    const { data: event, error: eventError } = await supabase
+      .from("events")
+      .select("id")
+      .eq("id", member.event_id)
+      .eq("host_id", userId)
+      .single();
+
+    if (eventError || !event) {
+      return { success: false, error: "권한이 없습니다." };
+    }
+  }
+
+  const { error } = await supabase
+    .from("event_members")
+    .delete()
+    .eq("id", memberId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath(`/protected/events/${member.event_id}`);
   return { success: true };
 }
 

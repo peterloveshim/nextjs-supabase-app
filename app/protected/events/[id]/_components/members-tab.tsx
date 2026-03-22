@@ -54,6 +54,8 @@ type MembersTabProps = {
     memberId: string,
     status: "approved" | "rejected"
   ) => void;
+  // 참여 취소 핸들러
+  onCancelMembershipClick?: (memberId: string) => void;
   // mutation 로딩 상태
   isApplying?: boolean;
   isUpdatingMember?: boolean;
@@ -65,6 +67,7 @@ export function MembersTab({
   currentUserId,
   onApplyEvent,
   onUpdateMemberStatus,
+  onCancelMembershipClick,
   isApplying = false,
   isUpdatingMember = false,
 }: MembersTabProps) {
@@ -84,14 +87,14 @@ export function MembersTab({
     <div className="space-y-4">
       {/* 참여자 카운트 헤더 */}
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-muted-foreground">
+        <p className="text-muted-foreground text-sm font-medium">
           승인된 참여자{" "}
-          <span className="font-bold text-foreground">{approvedCount}</span> /{" "}
+          <span className="text-foreground font-bold">{approvedCount}</span> /{" "}
           {event.capacity}명
         </p>
 
-        {/* 비주최자이고 아직 미승인 상태인 경우 참여 신청 버튼 */}
-        {!isHost && !isApproved && !isPending && (
+        {/* 미참여 상태인 경우 참여 신청 버튼 (주최자 포함) */}
+        {!isApproved && !isPending && (
           <Button
             size="sm"
             onClick={onApplyEvent}
@@ -112,7 +115,7 @@ export function MembersTab({
       {/* 참여자 목록 */}
       <div className="divide-y rounded-lg border">
         {event.members.length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground px-4 py-8 text-center text-sm">
             아직 참여 신청자가 없습니다.
           </p>
         ) : (
@@ -124,10 +127,10 @@ export function MembersTab({
               {/* 멤버 정보 */}
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{member.name}</p>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="text-muted-foreground truncate text-xs">
                   {member.email}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   신청일: {formatDate(member.joinedAt)}
                 </p>
               </div>
@@ -164,6 +167,19 @@ export function MembersTab({
                   </Button>
                 </div>
               )}
+
+              {/* 참여 취소 버튼: 주최자(모든 approved 멤버) 또는 본인 */}
+              {member.status === "approved" &&
+                (isHost || member.userId === currentUserId) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-600"
+                    onClick={() => onCancelMembershipClick?.(member.id)}
+                  >
+                    참여 취소
+                  </Button>
+                )}
             </div>
           ))
         )}

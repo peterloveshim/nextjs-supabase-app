@@ -4,10 +4,21 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useApplyEvent,
+  useCancelMembership,
   useCurrentUserId,
   useDeleteEvent,
   useEventDetail,
@@ -38,7 +49,12 @@ export function EventDetailClient({
   defaultTab,
 }: EventDetailClientProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  // 자동 신청 실행 여부 추적 (중복 실행 방지)
+  const [cancelTargetMemberId, setCancelTargetMemberId] = useState<
+    string | null
+  >(null);
+  // 초대 링크로 접근 시 참여 확인 다이얼로그
+  const [joinConfirmOpen, setJoinConfirmOpen] = useState(false);
+  // 확인 다이얼로그 표시 여부 추적 (중복 실행 방지)
   const autoJoinFiredRef = useRef(false);
 
   // nuqs로 탭 상태를 URL 쿼리 파라미터에 동기화 (?tab=members)
@@ -66,39 +82,49 @@ export function EventDetailClient({
   const { mutate: applyEvent, isPending: isApplying } = useApplyEvent(id);
   const { mutate: updateMemberStatus, isPending: isUpdatingMember } =
     useUpdateMemberStatus(id);
+  const { mutate: cancelMembership, isPending: isCancellingMembership } =
+    useCancelMembership(id);
 
-  // autoJoin 자동 참여 신청 처리
+  // 초대 링크로 접근 시 참여 확인 다이얼로그 표시
   // 데이터 로드 완료 후 한 번만 실행 (중복 방지)
   useEffect(() => {
     if (!autoJoin) return;
     if (autoJoinFiredRef.current) return;
     if (isEventLoading || !event || !currentUserId) return;
 
-    // 주최자는 자동 신청 불필요
+    // 주최자는 다이얼로그 불필요
     if (isHost) return;
 
-    // 이미 신청했거나 승인된 경우 중복 신청 없이 종료
+    // 이미 신청했거나 승인된 경우 다이얼로그 표시 불필요
     const myMember = event.members.find((m) => m.userId === currentUserId);
     if (myMember?.status === "pending" || myMember?.status === "approved") {
       return;
     }
 
-    // 자동 참여 신청 실행
+    // 참여 확인 다이얼로그 표시
     autoJoinFiredRef.current = true;
+    setJoinConfirmOpen(true);
+  }, [autoJoin, isEventLoading, event, currentUserId, isHost]);
+
+  // 초대 링크 참여 확인 처리
+  const handleConfirmJoin = () => {
+    setJoinConfirmOpen(false);
     applyEvent(undefined, {
       onSuccess: (result) => {
         if (result.success) {
-          toast.success("참여 신청이 자동으로 완료되었습니다.");
+          toast.success("참여 신청이 완료되었습니다.");
         } else {
-          // 이미 신청된 경우 등 graceful 처리
           if (result.error?.includes("이미")) {
             return;
           }
-          toast.error(result.error ?? "자동 참여 신청에 실패했습니다.");
+          toast.error(result.error ?? "참여 신청에 실패했습니다.");
         }
       },
+      onError: () => {
+        toast.error("참여 신청 중 오류가 발생했습니다.");
+      },
     });
-  }, [autoJoin, isEventLoading, event, currentUserId, isHost, applyEvent]);
+  };
 
   // 이벤트 삭제 처리
   const handleDelete = () => {
@@ -128,6 +154,25 @@ export function EventDetailClient({
       },
       onError: () => {
         toast.error("참여 신청 중 오류가 발생했습니다.");
+      },
+    });
+  };
+
+  // 참여 취소 확인 처리
+  const handleConfirmCancelMembership = () => {
+    if (!cancelTargetMemberId) return;
+    cancelMembership(cancelTargetMemberId, {
+      onSuccess: (result) => {
+        if (result.success) {
+          toast.success("참여가 취소되었습니다.");
+        } else {
+          toast.error(result.error ?? "참여 취소에 실패했습니다.");
+        }
+        setCancelTargetMemberId(null);
+      },
+      onError: () => {
+        toast.error("참여 취소 중 오류가 발생했습니다.");
+        setCancelTargetMemberId(null);
       },
     });
   };
@@ -221,6 +266,7 @@ export function EventDetailClient({
             currentUserId={currentUserId ?? undefined}
             onApplyEvent={handleApplyEvent}
             onUpdateMemberStatus={handleUpdateMemberStatus}
+            onCancelMembershipClick={setCancelTargetMemberId}
             isApplying={isApplying}
             isUpdatingMember={isUpdatingMember}
           />
@@ -246,6 +292,58 @@ export function EventDetailClient({
         onConfirm={handleDelete}
         isDeleting={isDeleting}
       />
+
+      {/* 초대 링크 참여 확인 다이얼로그 */}
+      <AlertDialog open={joinConfirmOpen} onOpenChange={setJoinConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>이벤트 참여</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="text-foreground font-semibold">
+                {event.title}
+              </span>{" "}
+              이벤트에 참여 신청하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmJoin}
+              disabled={isApplying}
+            >
+              {isApplying ? "신청 중..." : "참여 신청"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 참여 취소 확인 다이얼로그 */}
+      <AlertDialog
+        open={cancelTargetMemberId !== null}
+        onOpenChange={(open) => {
+          if (!open) setCancelTargetMemberId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>참여 취소</AlertDialogTitle>
+            <AlertDialogDescription>
+              정말 이 참여자의 참여를 취소하시겠습니까? 취소 후 재신청이
+              가능합니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>닫기</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmCancelMembership}
+              disabled={isCancellingMembership}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isCancellingMembership ? "취소 중..." : "참여 취소"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

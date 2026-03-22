@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import {
   applyEvent,
+  cancelMembership,
   createEvent,
   deleteEvent,
   fetchCurrentUserId,
@@ -132,6 +133,27 @@ export function useApplyEvent(eventId: string) {
 
   return useMutation({
     mutationFn: () => applyEvent(eventId),
+    onSuccess: (result) => {
+      if (result.success) {
+        queryClient.invalidateQueries({
+          queryKey: eventQueryKeys.detail(eventId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: eventQueryKeys.joinedEvents(),
+        });
+      }
+    },
+  });
+}
+
+/**
+ * 참여 취소 mutation (approved 멤버 삭제)
+ */
+export function useCancelMembership(eventId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (memberId: string) => cancelMembership(memberId),
     onSuccess: (result) => {
       if (result.success) {
         queryClient.invalidateQueries({
