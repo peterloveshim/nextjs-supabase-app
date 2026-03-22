@@ -1,7 +1,7 @@
 import { Bell, CalendarDays, Users } from "lucide-react";
 import Link from "next/link";
 
-import { LandingHeader } from "@/components/landing-header";
+import { HeaderNav } from "@/components/header-nav";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,10 +37,11 @@ export default async function Home() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const isLoggedIn = !!data?.claims;
+  const email = data?.claims?.email ?? undefined;
 
   return (
     <div className="flex min-h-screen flex-col">
-      <LandingHeader />
+      <HeaderNav email={email} />
 
       {/* 히어로 섹션 */}
       <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-6 px-4 py-16 text-center md:py-24">

@@ -58,8 +58,9 @@ function NavLinks({
   );
 }
 
-export function HeaderNav({ email }: { email: string }) {
+export function HeaderNav({ email }: { email?: string }) {
   const router = useRouter();
+  const isLoggedIn = !!email;
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -83,70 +84,123 @@ export function HeaderNav({ email }: { email: string }) {
           {/* 테마 토글 버튼 */}
           <ThemeToggle />
 
-          {/* 알림 아이콘 */}
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/protected/notifications" aria-label="알림">
-              <Bell className="h-5 w-5" />
-            </Link>
-          </Button>
-
-          {/* 이메일 드롭다운 (md 이상에서 표시) */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="text-muted-foreground hover:text-foreground hidden h-auto px-2 py-1 text-sm md:flex"
-              >
-                {email}
+          {isLoggedIn ? (
+            <>
+              {/* 알림 아이콘 */}
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/protected/notifications" aria-label="알림">
+                  <Bell className="h-5 w-5" />
+                </Link>
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="cursor-pointer gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                로그아웃
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
 
-          {/* 모바일 햄버거 메뉴 */}
-          <Sheet>
-            <SheetTrigger asChild>
+              {/* 이메일 드롭다운 (md 이상에서 표시) */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-foreground hidden h-auto px-2 py-1 text-sm md:flex"
+                  >
+                    {email}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer gap-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    로그아웃
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* 모바일 햄버거 메뉴 */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    aria-label="메뉴"
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right">
+                  <SheetHeader>
+                    <SheetTitle>모임이음</SheetTitle>
+                  </SheetHeader>
+                  <Separator className="my-4" />
+                  <NavLinks className="flex flex-col gap-4" />
+                  {/* 모바일 이메일 + 로그아웃 */}
+                  <Separator className="my-4" />
+                  <div className="flex flex-col gap-3">
+                    <span className="text-muted-foreground truncate text-sm">
+                      {email}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleLogout}
+                      className="w-full gap-2"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      로그아웃
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </>
+          ) : (
+            /* 비로그인 상태: 로그인/회원가입 버튼 */
+            <>
               <Button
+                asChild
+                size="sm"
                 variant="ghost"
-                size="icon"
-                className="md:hidden"
-                aria-label="메뉴"
+                className="hidden md:flex"
               >
-                <Menu className="h-5 w-5" />
+                <Link href="/auth/login">로그인</Link>
               </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>모임이음</SheetTitle>
-              </SheetHeader>
-              <Separator className="my-4" />
-              <NavLinks className="flex flex-col gap-4" />
-              {/* 모바일 이메일 + 로그아웃 */}
-              <Separator className="my-4" />
-              <div className="flex flex-col gap-3">
-                <span className="text-muted-foreground truncate text-sm">
-                  {email}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="w-full gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  로그아웃
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+              <Button asChild size="sm" className="hidden md:flex">
+                <Link href="/auth/sign-up">회원가입</Link>
+              </Button>
+              {/* 모바일 햄버거 메뉴 */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    aria-label="메뉴"
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right">
+                  <SheetHeader>
+                    <SheetTitle>모임이음</SheetTitle>
+                  </SheetHeader>
+                  <Separator className="my-4" />
+                  <NavLinks className="flex flex-col gap-4" />
+                  <Separator className="my-4" />
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      <Link href="/auth/login">로그인</Link>
+                    </Button>
+                    <Button asChild size="sm" className="w-full">
+                      <Link href="/auth/sign-up">회원가입</Link>
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </>
+          )}
         </div>
       </div>
     </header>
