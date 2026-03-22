@@ -32,8 +32,10 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const [isSuggestGoogle, setIsSuggestGoogle] = useState(false);
   const router = useRouter();
 
-  // 로그인 성공 후 이동 경로: redirect_to 파라미터 → 기본 홈 페이지
-  const destination = redirectTo ? decodeURIComponent(redirectTo) : "/";
+  // 로그인 성공 후 이동 경로: redirect_to 파라미터 → 이벤트 목록 페이지
+  const destination = redirectTo
+    ? decodeURIComponent(redirectTo)
+    : "/protected/events";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

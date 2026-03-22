@@ -1,8 +1,8 @@
 "use client";
 
-import { Bell, LogOut, Menu, User } from "lucide-react";
+import { Bell, CalendarDays, LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
@@ -21,43 +22,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
-
-const NAV_LINKS = [
-  { href: "/protected/events", label: "이벤트" },
-  { href: "/protected/notifications", label: "알림" },
-  { href: "/protected/profile", label: "프로필" },
-];
-
-function NavLinks({
-  className,
-  onClick,
-}: {
-  className?: string;
-  onClick?: () => void;
-}) {
-  const pathname = usePathname();
-
-  return (
-    <nav className={className}>
-      {NAV_LINKS.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          onClick={onClick}
-          className={cn(
-            "hover:text-foreground text-sm font-medium transition-colors",
-            pathname.startsWith(link.href)
-              ? "text-foreground"
-              : "text-muted-foreground"
-          )}
-        >
-          {link.label}
-        </Link>
-      ))}
-    </nav>
-  );
-}
 
 export function HeaderNav({ email }: { email?: string }) {
   const router = useRouter();
@@ -72,13 +36,10 @@ export function HeaderNav({ email }: { email?: string }) {
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        {/* 로고 */}
-        <Link href="/" className="text-lg font-bold">
+        {/* 로고 — 이벤트 목록으로 이동 */}
+        <Link href="/protected/events" className="text-lg font-bold">
           모임이음
         </Link>
-
-        {/* 데스크톱 네비게이션 */}
-        <NavLinks className="hidden items-center gap-6 md:flex" />
 
         {/* 우측 액션 영역 */}
         <div className="flex items-center gap-2">
@@ -87,14 +48,7 @@ export function HeaderNav({ email }: { email?: string }) {
 
           {isLoggedIn ? (
             <>
-              {/* 알림 아이콘 */}
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/protected/notifications" aria-label="알림">
-                  <Bell className="h-5 w-5" />
-                </Link>
-              </Button>
-
-              {/* 이메일 드롭다운 (md 이상에서 표시) */}
+              {/* 이메일 드롭다운 (md 이상) — 이벤트·알림·프로필·로그아웃 */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -105,6 +59,19 @@ export function HeaderNav({ email }: { email?: string }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild className="cursor-pointer gap-2">
+                    <Link href="/protected/events">
+                      <CalendarDays className="h-4 w-4" />
+                      이벤트
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer gap-2">
+                    <Link href="/protected/notifications">
+                      <Bell className="h-4 w-4" />
+                      알림
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem asChild className="cursor-pointer gap-2">
                     <Link href="/protected/profile">
                       <User className="h-4 w-4" />
@@ -138,8 +105,30 @@ export function HeaderNav({ email }: { email?: string }) {
                     <SheetTitle>모임이음</SheetTitle>
                   </SheetHeader>
                   <Separator className="my-4" />
-                  <NavLinks className="flex flex-col gap-4" />
-                  {/* 모바일 이메일 + 로그아웃 */}
+                  {/* 모바일 네비게이션 */}
+                  <nav className="flex flex-col gap-4">
+                    <Link
+                      href="/protected/events"
+                      className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
+                    >
+                      <CalendarDays className="h-4 w-4" />
+                      이벤트
+                    </Link>
+                    <Link
+                      href="/protected/notifications"
+                      className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
+                    >
+                      <Bell className="h-4 w-4" />
+                      알림
+                    </Link>
+                    <Link
+                      href="/protected/profile"
+                      className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
+                    >
+                      <User className="h-4 w-4" />
+                      프로필
+                    </Link>
+                  </nav>
                   <Separator className="my-4" />
                   <div className="flex flex-col gap-3">
                     <span className="text-muted-foreground truncate text-sm">
@@ -188,8 +177,6 @@ export function HeaderNav({ email }: { email?: string }) {
                   <SheetHeader>
                     <SheetTitle>모임이음</SheetTitle>
                   </SheetHeader>
-                  <Separator className="my-4" />
-                  <NavLinks className="flex flex-col gap-4" />
                   <Separator className="my-4" />
                   <div className="flex flex-col gap-2">
                     <Button
